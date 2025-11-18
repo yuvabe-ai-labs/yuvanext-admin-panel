@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Admin } from "@/types/users";
+import type { Admin } from "@/types/users.type";
 
 export const getAdminByUserId = async (userId: string) => {
   try {
