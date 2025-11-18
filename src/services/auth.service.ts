@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { SignInResponse } from "@/types/users";
+import type { SignInResponse } from "@/types/auth.type";
 import { getAdminByUserId } from "./admin.service";
+import { Unauthorized } from "@/errors/AppError";
 
 export const signInService = async (
   email: string,
@@ -12,22 +13,26 @@ export const signInService = async (
       password,
     });
 
-    if (error) return { error };
-
-    if (!data.user || !data.session) {
-      return { error: new Error("Invalid login response") };
+    if (error) {
+      return { error: new Unauthorized(error.message, 401, "AUTH_FAILED") };
     }
 
-    // Validate admin access
+    if (!data.user || !data.session) {
+      return { error: new Unauthorized("Invalid login response", 400) };
+    }
+
     const adminResult = await getAdminByUserId(data.user.id);
 
     if (!adminResult.data) {
       return {
-        error: new Error("You are not authorized to access this admin panel."),
+        error: new Unauthorized(
+          "You are not authorized to access this admin panel.",
+          403,
+          "UNAUTHORIZED_ADMIN"
+        ),
       };
     }
 
-    // Successful login
     return {
       error: null,
       data: {
@@ -36,8 +41,8 @@ export const signInService = async (
         admin: adminResult.data,
       },
     };
-  } catch (e) {
-    return { error: new Error("Unexpected login error") };
+  } catch (err) {
+    return { error: new Unauthorized("Unexpected login error", 500) };
   }
 };
 

@@ -5,23 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
-
+import { signInSchema } from "@/lib/schema";
 import signupIllustrate from "@/assets/signinillustion.png";
 import signinLogo from "@/assets/signinLogo.svg";
 import { Eye, EyeOff } from "lucide-react";
-
-// Validation schema
-const signInSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(6, "Password must be at least 6 characters"),
-  keepLoggedIn: z.boolean().catch(false),
-});
+import { signOutService } from "@/services/auth.service";
+import { Unauthorized } from "@/errors/AppError";
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
@@ -49,14 +38,24 @@ const SignIn = () => {
     const result = await signIn(data.email, data.password);
 
     if (result.error) {
-      // Check if it's an authorization error (user logged in but not admin)
-      if (result.error.message.includes("not authorized")) {
+      // Detect unauthorized-admin response and sign out the user immediately
+      const isUnauthorizedAdmin =
+        (result.error instanceof Unauthorized &&
+          result.error.code === "UNAUTHORIZED_ADMIN") ||
+        result.error?.message?.toLowerCase().includes("not authorized");
+
+      if (isUnauthorizedAdmin) {
+        try {
+          await signOutService(); // sign out the session created by supabase
+        } catch {
+          // ignore sign-out errors, still proceed to inform the user
+        }
+
         toast({
           title: "Access Denied",
           description: "You are not an admin user.",
           variant: "destructive",
         });
-        // Navigate to unauthorized page (user is logged in but not admin)
         navigate("/unauthorized");
         return;
       }

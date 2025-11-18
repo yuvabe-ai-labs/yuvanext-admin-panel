@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import type { Admin, AuthContextType } from "@/types/users";
+import type { Admin } from "@/types/users.type";
 import { signInService, signOutService } from "@/services/auth.service";
 import { getAdminByUserId } from "@/services/admin.service";
+import type { AuthContextType } from "@/types/auth.type";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
