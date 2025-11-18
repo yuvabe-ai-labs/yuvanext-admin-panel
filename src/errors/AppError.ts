@@ -1,5 +1,5 @@
 
-export class AppError extends Error {
+export class Unauthorized extends Error {
   statusCode?: number;
   details?: any;
   code?: string;
