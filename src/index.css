@@ -41,6 +41,34 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Neue Haas Grotesk Text Pro Font */
+@font-face {
+  font-family: "Neue Haas Grotesk Text Pro";
+  src: url("/src/assets/fonts/NeueHaasGroteskTextPro-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Grotesk Text Pro";
+  src: url("/src/assets/fonts/NeueHaasGroteskTextPro-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Grotesk Text Pro";
+  src: url("/src/assets/fonts/NeueHaasGroteskTextPro-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -113,6 +141,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: "Neue Haas Grotesk Text Pro", sans-serif;
   }
   body {
     @apply bg-background text-foreground;
