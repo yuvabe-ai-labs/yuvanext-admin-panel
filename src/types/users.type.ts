@@ -1,5 +1,3 @@
-import type { User, Session } from "@supabase/supabase-js";
-
 export interface Admin {
   id: string;
   user_id: string;
