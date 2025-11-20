@@ -2,9 +2,33 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 
-// Use any type to accept whatever your API returns
+// -------------------------
+// STRICT TYPE DEFINITIONS
+// -------------------------
+
+interface Profile {
+  id: string;
+  full_name: string | null;
+  email?: string | null;
+}
+
+interface StudentProfile {
+  avatar_url?: string | null;
+  headline?: string | null;
+  location?: string | null;
+}
+
+interface StudentRecord {
+  profile: Profile;
+  student_profile: StudentProfile | null;
+}
+
+// -------------------------
+// COMPONENT
+// -------------------------
+
 interface RecentCandidatesProps {
-  students: any[];
+  students: StudentRecord[];
   isLoading: boolean;
 }
 
@@ -29,40 +53,42 @@ export default function RecentCandidates({
               No recent candidates
             </p>
           ) : (
-            students.map((student) => (
-              <div
-                key={student.profile.id}
-                className="flex items-start gap-3 px-1"
-              >
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    src={student.student_profile?.avatar_url || undefined}
-                  />
-                  <AvatarFallback className="text-base">
-                    {student.profile.full_name?.charAt(0).toUpperCase() || "S"}
-                  </AvatarFallback>
-                </Avatar>
+            students.map((student) => {
+              const { profile, student_profile } = student;
 
-                <div className="flex-1 leading-tight">
-                  <p className="font-medium text-sm">
-                    {student.profile.full_name}
-                  </p>
+              const fullName = profile.full_name ?? "Unnamed";
+              const avatarUrl = student_profile?.avatar_url ?? undefined;
+              const headline = student_profile?.headline ?? null;
+              const location = student_profile?.location ?? null;
 
-                  {student.student_profile?.headline && (
-                    <p className="text-[12px] text-muted-foreground">
-                      {student.student_profile.headline}
-                    </p>
-                  )}
+              return (
+                <div key={profile.id} className="flex items-start gap-3 px-1">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={avatarUrl} />
+                    <AvatarFallback className="text-base">
+                      {fullName.charAt(0)?.toUpperCase() || "S"}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  {student.student_profile?.location && (
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {student.student_profile.location}
-                    </p>
-                  )}
+                  <div className="flex-1 leading-tight">
+                    <p className="font-medium text-sm">{fullName}</p>
+
+                    {headline && (
+                      <p className="text-[12px] text-muted-foreground">
+                        {headline}
+                      </p>
+                    )}
+
+                    {location && (
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {location}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

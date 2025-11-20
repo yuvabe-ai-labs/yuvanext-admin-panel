@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { useMemo } from "react";
 
-interface PerformanceData {
+export interface PerformanceData {
   month: string;
   value: number;
 }
@@ -18,11 +18,23 @@ interface PerformanceChartProps {
   data: PerformanceData[];
 }
 
-const CustomDot = (props: any) => {
-  const { cx, cy, index, dataLength } = props;
+interface CustomDotProps {
+  cx?: number;
+  cy?: number;
+  index?: number;
+  dataLength: number;
+}
 
-  // Highlight LAST point
-  if (index === dataLength - 1) {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    payload: PerformanceData;
+  }>;
+}
+
+const CustomDot = ({ cx, cy, index, dataLength }: CustomDotProps) => {
+  if (index === dataLength - 1 && cx !== undefined && cy !== undefined) {
     return (
       <g>
         <circle
@@ -41,13 +53,15 @@ const CustomDot = (props: any) => {
   return null;
 };
 
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+  if (active && payload && payload.length > 0) {
+    const item = payload[0];
+
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-md">
-        <p className="text-xs text-gray-600">{payload[0].payload.month}</p>
+        <p className="text-xs text-gray-600">{item.payload.month}</p>
         <p className="text-sm font-semibold text-gray-900">
-          {payload[0].value} signups
+          {item.value} signups
         </p>
       </div>
     );
@@ -84,12 +98,14 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
                 <stop offset="100%" stopColor="#fb923c" stopOpacity={0.05} />
               </linearGradient>
             </defs>
+
             <CartesianGrid
               vertical={false}
               horizontal={true}
               stroke="#e5e7eb"
               strokeDasharray="3 3"
             />
+
             <XAxis
               dataKey="month"
               axisLine={true}
@@ -99,6 +115,7 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
               padding={{ left: 0, right: 0 }}
               stroke="#e5e7eb"
             />
+
             <YAxis
               axisLine={true}
               tickLine={false}
@@ -107,16 +124,16 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
               allowDecimals={false}
               stroke="#e5e7eb"
             />
+
             <Tooltip content={<CustomTooltip />} />
+
             <Area
               type="monotone"
               dataKey="value"
               stroke="#f97316"
               strokeWidth={3}
               fill="url(#colorValue)"
-              dot={(props: any) => (
-                <CustomDot {...props} dataLength={data.length} />
-              )}
+              dot={(props) => <CustomDot {...props} dataLength={data.length} />}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -9,7 +9,6 @@ import {
 import type {
   StudentProfileData,
   UnitProfileData,
-  Profile,
 } from "@/types/profile.types";
 
 // GET ALL PROFILES
@@ -29,7 +28,6 @@ export const useAllProfiles = (
 export const useProfileDetails = (profileId: string) => {
   return useQuery<{
     data: StudentProfileData | UnitProfileData | null;
-    error: any;
   }>({
     queryKey: ["profileDetails", profileId],
     queryFn: () => getProfileDetailsById(profileId),

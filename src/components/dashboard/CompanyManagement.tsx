@@ -1,8 +1,22 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+interface UIUnit {
+  profile: {
+    id: string;
+    full_name: string;
+    email: string | null;
+  };
+  unit_profile: {
+    unit_name: string | null;
+    unit_type: string | null;
+    avatar_url: string | null;
+    address: string | null;
+  } | null;
+}
+
 interface CompanyManagementProps {
-  units: any[];
+  units: UIUnit[];
   isLoading: boolean;
 }
 
@@ -32,14 +46,15 @@ export default function CompanyManagement({
               key={unit.profile.id}
               className="flex justify-between items-center p-4 border rounded-xl hover:bg-gray-50 transition-colors"
             >
+              {/* Left section */}
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
                   <AvatarImage
-                    src={unit.unit_profile?.avatar_url || undefined}
+                    src={unit.unit_profile?.avatar_url ?? undefined}
                   />
                   <AvatarFallback>
-                    {unit.unit_profile?.unit_name?.charAt(0) ||
-                      unit.profile.full_name?.charAt(0) ||
+                    {unit.unit_profile?.unit_name?.charAt(0) ??
+                      unit.profile.full_name?.charAt(0) ??
                       "U"}
                   </AvatarFallback>
                 </Avatar>
@@ -54,6 +69,7 @@ export default function CompanyManagement({
                 </div>
               </div>
 
+              {/* Right section */}
               <div className="text-right">
                 <p className="text-sm text-primary font-medium">
                   {unit.unit_profile?.unit_type || "Company"}

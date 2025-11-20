@@ -5,9 +5,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useRef } from "react";
 
-// Use any type to accept whatever your transformed data is
+interface UICandidate {
+  id: string;
+  name: string;
+  role: string;
+  location?: string | null;
+  bio?: string[] | string | null;
+  skills?: string[] | null;
+  avatar_url?: string | null;
+}
+
 interface CandidateManagementProps {
-  candidates: any[];
+  candidates: UICandidate[];
 }
 
 export default function CandidateManagement({
@@ -50,27 +59,26 @@ export default function CandidateManagement({
           ref={scrollRef}
           className="flex gap-6 overflow-x-auto scrollbar-hide py-4 px-8"
         >
-          {candidates.map((candidate, index) => {
-            const skills = Array.isArray(candidate.skills)
-              ? candidate.skills
-              : [];
+          {candidates.map((candidate) => {
+            const skills = candidate.skills ?? [];
             const bio = Array.isArray(candidate.bio)
               ? candidate.bio.join(" ")
-              : candidate.bio;
+              : candidate.bio ?? "";
 
             return (
               <Card
-                key={candidate.id || index}
+                key={candidate.id}
                 className="min-w-[320px] border border-border/50 hover:shadow-lg transition-shadow rounded-3xl flex flex-col"
               >
                 <CardContent className="p-4 sm:p-6 space-y-4 flex flex-col flex-1">
+                  {/* Header */}
                   <div className="flex items-center gap-4">
                     <Avatar className="w-16 h-16 ring-4 ring-green-500">
-                      <AvatarImage src={candidate.avatar_url || undefined} />
+                      <AvatarImage src={candidate.avatar_url ?? undefined} />
                       <AvatarFallback className="font-semibold">
                         {candidate.name
-                          .split(" ")
-                          .map((n: string) => n[0])
+                          ?.split(" ")
+                          .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
@@ -92,26 +100,26 @@ export default function CandidateManagement({
                     </div>
                   </div>
 
+                  {/* Bio */}
                   <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
                     {bio}
                   </p>
 
+                  {/* Skills */}
                   <div className="min-h-[28px]">
                     {skills.length > 0 && (
                       <div className="flex gap-2 overflow-hidden">
                         {skills.length > 3 ? (
                           <>
-                            {skills
-                              .slice(0, 3)
-                              .map((skill: string, i: number) => (
-                                <Badge
-                                  key={i}
-                                  variant="outline"
-                                  className="text-[10px] text-gray-600 bg-muted/40 rounded-full px-2 py-1 whitespace-nowrap"
-                                >
-                                  {skill}
-                                </Badge>
-                              ))}
+                            {skills.slice(0, 3).map((skill, i) => (
+                              <Badge
+                                key={i}
+                                variant="outline"
+                                className="text-[10px] text-gray-600 bg-muted/40 rounded-full px-2 py-1 whitespace-nowrap"
+                              >
+                                {skill}
+                              </Badge>
+                            ))}
                             <Badge
                               variant="outline"
                               className="text-[10px] text-gray-600 bg-muted/40 rounded-full px-2 py-1 whitespace-nowrap"
@@ -120,7 +128,7 @@ export default function CandidateManagement({
                             </Badge>
                           </>
                         ) : (
-                          skills.map((skill: string, i: number) => (
+                          skills.map((skill, i) => (
                             <Badge
                               key={i}
                               variant="outline"
@@ -136,6 +144,7 @@ export default function CandidateManagement({
 
                   <div className="border-t border-border/40"></div>
 
+                  {/* Button */}
                   <Button
                     variant="outline"
                     size="lg"

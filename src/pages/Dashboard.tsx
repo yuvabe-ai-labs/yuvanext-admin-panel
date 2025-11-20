@@ -76,7 +76,13 @@ export default function Dashboard() {
         bio:
           student.student_profile?.bio ||
           "Passionate about creating user-centered digital experiences.",
-        skills: student.student_profile?.skills || [],
+
+        skills: Array.isArray(student.student_profile?.skills)
+          ? student.student_profile!.skills.filter(
+              (s: unknown): s is string => typeof s === "string"
+            )
+          : [],
+
         avatar_url: student.student_profile?.avatar_url,
       })),
     [recentStudents]
