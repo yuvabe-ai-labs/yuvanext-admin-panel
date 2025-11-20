@@ -11,7 +11,6 @@ import {
 import type {
   StudentProfileData,
   UnitProfileData,
-  Profile,
 } from "@/types/profile.types";
 
 // GET ALL PROFILES

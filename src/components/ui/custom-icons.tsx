@@ -167,24 +167,7 @@ export const BagIcon = (props: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-export const SearchIcon = (props: React.SVGProps<SVGSVGElement>) => {
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 13 13"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <path
-      d="M12 12L8.25 8.25M9.5 5.125C9.5 5.69953 9.38684 6.26844 9.16697 6.79924C8.94711 7.33004 8.62485 7.81234 8.21859 8.21859C7.81234 8.62485 7.33004 8.94711 6.79924 9.16697C6.26844 9.38684 5.69953 9.5 5.125 9.5C4.55047 9.5 3.98156 9.38684 3.45076 9.16697C2.91996 8.94711 2.43766 8.62485 2.03141 8.21859C1.62515 7.81234 1.30289 7.33004 1.08303 6.79924C0.863163 6.26844 0.75 5.69953 0.75 5.125C0.75 3.96468 1.21094 2.85188 2.03141 2.03141C2.85188 1.21094 3.96468 0.75 5.125 0.75C6.28532 0.75 7.39812 1.21094 8.21859 2.03141C9.03906 2.85188 9.5 3.96468 9.5 5.125Z"
-      stroke="#9CA3AF"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>;
-};
+
 const AIIcon = (props: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg

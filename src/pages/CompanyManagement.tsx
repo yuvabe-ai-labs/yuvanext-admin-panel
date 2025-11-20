@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CompanyCard from "@/components/CompanyCard";
 import { useEffect, useRef, useState } from "react";
-import { Search, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
 export default function CompanyManagement() {
   const [page, setPage] = useState(1);
