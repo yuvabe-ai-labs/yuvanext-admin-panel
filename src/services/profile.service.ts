@@ -44,7 +44,10 @@ export const getAllProfiles = async (
 // Get profile by ID (returns StudentProfileData | UnitProfileData)
 export const getProfileDetailsById = async (
   profileId: string
-): Promise<{ data: StudentProfileData | UnitProfileData | null; error: any }> => {
+): Promise<{
+  data: StudentProfileData | UnitProfileData | null;
+  error: any;
+}> => {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
@@ -98,7 +101,12 @@ export const getAllStudents = async (
   pageSize: number = 20,
   searchTerm?: string
 ) => {
-  const profilesRes = await getAllProfiles(page, pageSize, "student", searchTerm);
+  const profilesRes = await getAllProfiles(
+    page,
+    pageSize,
+    "student",
+    searchTerm
+  );
 
   if (profilesRes.error) {
     return { ...profilesRes, data: [] as StudentProfileData[] };
@@ -126,7 +134,7 @@ export const getAllStudents = async (
   };
 };
 
-// Get all units 
+// Get all units
 export const getAllUnits = async (
   page: number = 1,
   pageSize: number = 20,
@@ -181,10 +189,40 @@ export const getProfileStats = async () => {
     .select("*", { count: "exact", head: true })
     .eq("onboarding_completed", true);
 
+  const { count: activeUnits } = await supabase
+    .from("profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("role", "unit")
+    .eq("onboarding_completed", true);
+
+  const { count: registeredUnits } = await supabase
+    .from("profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("role", "unit")
+    .eq("onboarding_completed", false);
+
   return {
     totalProfiles: totalProfiles ?? 0,
     totalStudents: totalStudents ?? 0,
     totalUnits: totalUnits ?? 0,
     completedOnboarding: completedOnboarding ?? 0,
+    activeUnits: activeUnits ?? 0,
+    registeredUnits: registeredUnits ?? 0,
   };
+};
+
+export const getActiveInternships = async () => {
+  const { count: totalInternships } = await supabase
+    .from("internships")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "active");
+
+  return { totalInternships: totalInternships ?? 0 };
+};
+
+export const getTotalApplications = async () => {
+  const { count: totalApplications } = await supabase
+    .from("applications")
+    .select("*", { count: "exact", head: true });
+  return { totalApplications: totalApplications ?? 0 };
 };

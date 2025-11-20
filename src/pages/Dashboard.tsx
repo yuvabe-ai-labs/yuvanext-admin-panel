@@ -191,7 +191,7 @@ export default function Dashboard() {
                         key={student.profile.id}
                         className="flex items-start gap-3"
                       >
-                        <Avatar className="h-10 w-10 flex-shrink-0">
+                        <Avatar className="h-10 w-10 shrink-0">
                           <AvatarImage
                             src={
                               student.student_profile?.avatar_url || undefined
@@ -215,7 +215,7 @@ export default function Dashboard() {
                           )}
                           {student.student_profile?.location && (
                             <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                              <MapPin className="w-3 h-3 flex-shrink-0" />
+                              <MapPin className="w-3 h-3 shrink-0" />
                               <span className="truncate">
                                 {student.student_profile.location}
                               </span>
@@ -252,7 +252,7 @@ export default function Dashboard() {
                         key={unit.profile.id}
                         className="flex items-start gap-3"
                       >
-                        <Avatar className="h-10 w-10 flex-shrink-0">
+                        <Avatar className="h-10 w-10 shrink-0">
                           <AvatarImage
                             src={unit.unit_profile?.avatar_url || undefined}
                             alt={unit.profile.full_name || "Unit"}
@@ -278,7 +278,7 @@ export default function Dashboard() {
                           )}
                           {unit.unit_profile?.address && (
                             <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                              <MapPin className="w-3 h-3 flex-shrink-0" />
+                              <MapPin className="w-3 h-3 shrink-0" />
                               <span className="truncate">
                                 {unit.unit_profile.address}
                               </span>
