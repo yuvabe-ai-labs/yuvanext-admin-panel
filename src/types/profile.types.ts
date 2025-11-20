@@ -1,10 +1,14 @@
 import type { Json } from "@/types/common";
 
+type UserRole = "student" | "unit";
+
+type ProfileType = "Student" | "Fresher" | "Working" | "Graduate";
+
 export interface Profile {
   id: string;
   user_id: string;
   full_name: string;
-  role: "student" | "unit";
+  role: UserRole;
   created_at: string;
   updated_at: string;
   onboarding_completed: boolean | null;
@@ -27,7 +31,7 @@ export interface UnitProfileData {
 export interface StudentProfile {
   id: string;
   profile_id: string;
-  profile_type: "Student" | "Fresher" | "Working" | "Graduate" | null;
+  profile_type: ProfileType
   experience_level: string | null;
   preferred_language: string | null;
 
@@ -103,4 +107,33 @@ export interface UnitProfile {
 
   gallery_images: Json[];
   glimpse: Json[];
+}
+
+export interface Candidate {
+  id: string;
+  name: string;
+  role: string;
+  location?: string | null;
+  bio?: string[] | string | null;
+  skills?: string[] | null;
+  avatar_url?: string | null;
+}
+
+export interface Unit {
+  profile: {
+    id: string;
+    full_name: string;
+    email: string | null;
+  };
+  unit_profile: {
+    unit_name: string | null;
+    unit_type: string | null;
+    avatar_url: string | null;
+    address: string | null;
+  } | null;
+}
+
+export interface PerformanceData {
+  month: string;
+  value: number;
 }

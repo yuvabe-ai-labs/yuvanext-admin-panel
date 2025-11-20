@@ -1,27 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
-
-interface Profile {
-  id: string;
-  full_name: string | null;
-  email?: string | null;
-}
-
-interface UnitProfile {
-  unit_name?: string | null;
-  unit_type?: string | null;
-  address?: string | null;
-  avatar_url?: string | null;
-}
-
-interface UnitRecord {
-  profile: Profile;
-  unit_profile: UnitProfile | null;
-}
+import type { Unit } from "@/types/profile.types";
 
 interface RecentUnitsProps {
-  units: UnitRecord[];
+  units: Unit[];
   isLoading: boolean;
 }
 
@@ -44,8 +27,7 @@ export default function RecentUnits({ units, isLoading }: RecentUnitsProps) {
             units.map((unit) => {
               const { profile, unit_profile } = unit;
 
-              const unitName =
-                unit_profile?.unit_name || profile.full_name || "Unnamed";
+              const unitName = unit_profile?.unit_name || profile?.full_name;
 
               const avatarUrl = unit_profile?.avatar_url ?? undefined;
               const unitType = unit_profile?.unit_type ?? null;
