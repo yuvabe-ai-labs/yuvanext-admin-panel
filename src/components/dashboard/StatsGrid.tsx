@@ -1,30 +1,41 @@
-import companies from "@/assets/companies.svg";
-import candidates from "@/assets/candidates.svg";
-import active_posts from "@/assets/active_posts.svg";
-import courses from "@/assets/courses.svg";
-import hired from "@/assets/hired.svg";
-import platformhealth from "@/assets/platformhealth.svg";
+import {
+  Companies,
+  Hired,
+  Platformhealth,
+  Courses,
+  Posts,
+  Candidates,
+} from "@/components/ui/custom-icons";
 
 interface StatCardProps {
-  icon: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
   value: number | string;
   subtext: string;
   bgColor: string;
 }
 
-const StatCard = ({ icon, label, value, subtext, bgColor }: StatCardProps) => (
-  <div className={`${bgColor} rounded-2xl p-4`}>
-    <div className="flex items-start gap-3">
-      <img src={icon} className="w-10 h-10" alt={label} />
-      <div>
-        <p className="text-xs font-medium text-gray-600">{label}</p>
-        <p className="text-3xl font-bold">{value}</p>
-        <p className="text-xs text-primary">{subtext}</p>
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
+  subtext,
+  bgColor,
+}: StatCardProps) => {
+  return (
+    <div className={`${bgColor} rounded-2xl p-4`}>
+      <div className="flex items-start gap-3">
+        <Icon className="w-10 h-10" />
+
+        <div>
+          <p className="text-xs font-medium text-gray-600">{label}</p>
+          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-xs text-primary">{subtext}</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface StatsGridProps {
   totalUnits: number;
@@ -41,42 +52,42 @@ export default function StatsGrid({
 }: StatsGridProps) {
   const stats = [
     {
-      icon: companies,
+      icon: Companies,
       label: "Companies",
       value: totalUnits,
       subtext: `+${newUnitsThisMonth} new this month`,
       bgColor: "bg-blue-50",
     },
     {
-      icon: candidates,
+      icon: Candidates,
       label: "Candidates",
       value: totalStudents,
       subtext: `+${newStudentsThisMonth} new this month`,
       bgColor: "bg-orange-50",
     },
     {
-      icon: active_posts,
+      icon: Posts,
       label: "Active Posts",
       value: 16,
       subtext: "+2 new this month",
       bgColor: "bg-yellow-50",
     },
     {
-      icon: courses,
+      icon: Courses,
       label: "Courses",
       value: 12,
       subtext: "+3 new this month",
       bgColor: "bg-indigo-50",
     },
     {
-      icon: hired,
+      icon: Hired,
       label: "Hired",
       value: 25,
       subtext: "+5 new this month",
       bgColor: "bg-pink-50",
     },
     {
-      icon: platformhealth,
+      icon: Platformhealth,
       label: "Platform Health",
       value: "98%",
       subtext: "Stable this month",
