@@ -1,10 +1,12 @@
+import type { Json } from "@/types/common";
+
 export interface Profile {
   id: string;
   user_id: string;
   full_name: string;
   role: "student" | "unit";
-  created_at: string; 
-  updated_at: string; 
+  created_at: string;
+  updated_at: string;
   onboarding_completed: boolean | null;
   gender: string | null;
   phone: string | null;
@@ -22,34 +24,38 @@ export interface UnitProfileData {
   unit_profile: UnitProfile;
 }
 
-
-
 export interface StudentProfile {
   id: string;
   profile_id: string;
   profile_type: "Student" | "Fresher" | "Working" | "Graduate" | null;
   experience_level: string | null;
   preferred_language: string | null;
-  education: any[]; // jsonb
-  projects: any[];
-  languages: any[];
+
+  education: Json[];
+  projects: Json[];
+  languages: Json[];
+
   created_at: string;
   updated_at: string;
 
   resume_url: string | null;
   portfolio_url: string | null;
   cover_letter: string | null;
-  completed_courses: any[] | null;
+
+  completed_courses: Json[] | null;
+
   location: string | null;
-  achievements: any[];
+
+  achievements: Json[];
   linkedin_url: string | null;
   behance_url: string | null;
   dribbble_url: string | null;
   website_url: string | null;
 
   avatar_url: string | null;
-  skills: any[] | null;
-  interests: any[] | null;
+  skills: Json[] | null;
+  interests: Json[] | null;
+
   looking_for: string[] | null;
   bio: string[] | null;
   headline: string | null;
@@ -59,8 +65,9 @@ export interface StudentProfile {
   has_career_break: boolean | null;
 
   banner_url: string | null;
-  internships: any[];
-  links: any[];
+
+  internships: Json[];
+  links: Json[];
 }
 
 export interface UnitProfile {
@@ -70,9 +77,9 @@ export interface UnitProfile {
   unit_name: string | null;
   unit_type: string | null;
 
-  focus_areas: any[];
-  skills_offered: any[];
-  opportunities_offered: any[];
+  focus_areas: Json[];
+  skills_offered: Json[];
+  opportunities_offered: Json[];
 
   is_aurovillian: boolean | null;
   contact_email: string | null;
@@ -88,13 +95,12 @@ export interface UnitProfile {
   description: string | null;
   industry: string | null;
 
-  social_links: any[];
-  projects: any[];
+  social_links: Json[];
+  projects: Json[];
 
   banner_url: string | null;
   avatar_url: string | null;
 
-  gallery_images: any[];
-  glimpse: any[];
+  gallery_images: Json[];
+  glimpse: Json[];
 }
-
