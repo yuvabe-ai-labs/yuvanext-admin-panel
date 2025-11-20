@@ -5,6 +5,8 @@ import {
   getAllStudents,
   getAllUnits,
   getProfileStats,
+  getActiveInternships,
+  getTotalApplications,
 } from "@/services/profile.service";
 import type {
   StudentProfileData,
@@ -64,5 +66,21 @@ export const useProfileStats = () => {
   return useQuery({
     queryKey: ["profileStats"],
     queryFn: getProfileStats,
+  });
+};
+
+// GET TOTAL ACTIVE INTERNSHIPS
+export const useActiveInternships = () => {
+  return useQuery({
+    queryKey: ["activeInternships"],
+    queryFn: getActiveInternships,
+  });
+};
+
+// GET TOTAL APPLICATIONS
+export const useTotalApplications = () => {
+  return useQuery({
+    queryKey: ["totalApplications"],
+    queryFn: getTotalApplications,
   });
 };

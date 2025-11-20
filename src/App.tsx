@@ -15,6 +15,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
+import CompanyManagement from "./pages/CompanyManagement";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,15 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/company-management"
+              element={
+                <ProtectedRoute>
+                  <CompanyManagement />
                 </ProtectedRoute>
               }
             />
