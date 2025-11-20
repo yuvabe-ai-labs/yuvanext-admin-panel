@@ -19,9 +19,9 @@ interface PerformanceChartProps {
 }
 
 const CustomDot = (props: any) => {
-  const { cx, cy, index, payload } = props;
-  const dataLength = props.payload?.length || 0;
+  const { cx, cy, index, dataLength } = props;
 
+  // Highlight LAST point
   if (index === dataLength - 1) {
     return (
       <g>
@@ -37,6 +37,7 @@ const CustomDot = (props: any) => {
       </g>
     );
   }
+
   return null;
 };
 
@@ -113,7 +114,9 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
               stroke="#f97316"
               strokeWidth={3}
               fill="url(#colorValue)"
-              dot={<CustomDot />}
+              dot={(props: any) => (
+                <CustomDot {...props} dataLength={data.length} />
+              )}
             />
           </AreaChart>
         </ResponsiveContainer>
