@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-// import { ProfileIcon } from "lucide-react";
 import { BagIcon, PasteIcon, ProfileIcon } from "@/components/ui/custom-icons";
 import {
   useActiveInternships,
@@ -27,59 +26,47 @@ export default function CompanyManagement() {
   const { data: profileStats } = useProfileStats();
   const { data: activeInternships } = useActiveInternships();
   const { data: totalApplications } = useTotalApplications();
+  const { data: unitsData, isFetching } = useAllUnits(
+    page,
+    pageSize,
+    searchQuery
+  );
 
-  // RESET pagination when search changes
+  // Reset + merge data cleanly
   useEffect(() => {
-    setPage(1);
-    setCompanies([]);
-  }, [searchQuery]);
+    if (!unitsData) return;
 
-  const {
-    data: unitsData,
-    // isLoading,
-    isFetching,
-  } = useAllUnits(page, pageSize, searchQuery);
-
-  // Merge page results
-  useEffect(() => {
-    if (unitsData?.data) {
-      if (page === 1) {
-        setCompanies(unitsData.data);
-      } else {
-        setCompanies((prev) => [...prev, ...unitsData.data]);
-      }
+    // Reset when search changes
+    if (page === 1) {
+      setCompanies(unitsData.data || []);
+    } else {
+      // Append next page results
+      setCompanies((prev) => [...prev, ...(unitsData.data || [])]);
     }
 
-    if (unitsData?.totalPages) {
-      setTotalPages(unitsData.totalPages);
-    }
-  }, [unitsData, page]);
+    setTotalPages(unitsData.totalPages ?? null);
+  }, [unitsData]);
 
   /** Intersection Observer for infinite scroll */
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        const target = entries[0];
-
-        // ⭐ ADDED: Stop loading when no more pages
-        if (
-          target.isIntersecting &&
-          !isFetching &&
-          totalPages !== null &&
-          page < totalPages
-        ) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting && !isFetching) {
+          if (totalPages && page < totalPages) {
+            setPage((p) => p + 1);
+          }
         }
       },
       { threshold: 1 }
     );
 
-    if (loaderRef.current) observer.observe(loaderRef.current);
+    const ref = loaderRef.current;
+    if (ref) observer.observe(ref);
 
     return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current);
+      if (ref) observer.unobserve(ref);
     };
-  }, [isFetching, totalPages, page]);
+  }, [isFetching, totalPages]);
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -21,7 +21,7 @@ export const getAllProfiles = async (
 
   if (role) query = query.eq("role", role);
 
-  if (searchTerm) {
+  if (searchTerm?.trim()) {
     query = query.or(
       `full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`
     );
