@@ -1,34 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
-
-// -------------------------
-// STRICT TYPE DEFINITIONS
-// -------------------------
-
-interface Profile {
-  id: string;
-  full_name: string | null;
-  email?: string | null;
-}
-
-interface StudentProfile {
-  avatar_url?: string | null;
-  headline?: string | null;
-  location?: string | null;
-}
-
-interface StudentRecord {
-  profile: Profile;
-  student_profile: StudentProfile | null;
-}
-
-// -------------------------
-// COMPONENT
-// -------------------------
+import type { StudentProfileData } from "@/types/profile.types";
 
 interface RecentCandidatesProps {
-  students: StudentRecord[];
+  students: StudentProfileData[];
   isLoading: boolean;
 }
 
@@ -56,7 +32,7 @@ export default function RecentCandidates({
             students.map((student) => {
               const { profile, student_profile } = student;
 
-              const fullName = profile.full_name ?? "Unnamed";
+              const fullName = profile?.full_name;
               const avatarUrl = student_profile?.avatar_url ?? undefined;
               const headline = student_profile?.headline ?? null;
               const location = student_profile?.location ?? null;
@@ -66,7 +42,7 @@ export default function RecentCandidates({
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="text-base">
-                      {fullName.charAt(0)?.toUpperCase() || "S"}
+                      {fullName.charAt(0)?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
 

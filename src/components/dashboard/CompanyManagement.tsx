@@ -1,22 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-interface UIUnit {
-  profile: {
-    id: string;
-    full_name: string;
-    email: string | null;
-  };
-  unit_profile: {
-    unit_name: string | null;
-    unit_type: string | null;
-    avatar_url: string | null;
-    address: string | null;
-  } | null;
-}
+import type { Unit } from "@/types/profile.types";
 
 interface CompanyManagementProps {
-  units: UIUnit[];
+  units: Unit[];
   isLoading: boolean;
 }
 

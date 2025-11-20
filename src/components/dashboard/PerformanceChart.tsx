@@ -8,11 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useMemo } from "react";
-
-export interface PerformanceData {
-  month: string;
-  value: number;
-}
+import type { PerformanceData } from "@/types/profile.types";
 
 interface PerformanceChartProps {
   data: PerformanceData[];
