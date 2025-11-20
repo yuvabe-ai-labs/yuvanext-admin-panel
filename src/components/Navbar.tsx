@@ -25,7 +25,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
-        <div className="w-full mx-auto h-16 px-4 sm:px-6 lg:px-20 flex items-center justify-between">
+        <div className="w-full mx-auto h-18 px-6 sm:px-12 lg:px-30 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <a href="/dashboard">
