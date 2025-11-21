@@ -2,71 +2,37 @@ import Navbar from "@/components/Navbar";
 import { BagIcon, PasteIcon, ProfileIcon } from "@/components/ui/custom-icons";
 import {
   useActiveInternships,
-  useAllUnits,
   useProfileStats,
   useTotalApplications,
 } from "@/hooks/useProfile";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import CompanyCard from "@/components/CompanyCard";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { SearchIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import AddCompanyForm from "@/components/AddCompanyForm";
+
+// 🔥 NEW HOOK
+import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function CompanyManagement() {
-  const [page, setPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const pageSize = 10;
-
-  const [companies, setCompanies] = useState<any[]>([]);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
-
-  // ⭐ ADDED: Store total pages so we know when to stop loading
-  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const { data, fetchNextPage, hasNextPage } = useInfiniteUnits(
+    10,
+    searchQuery
+  );
+  const companies = data?.pages.flatMap((page) => page.data) || [];
 
   const { data: profileStats } = useProfileStats();
   const { data: activeInternships } = useActiveInternships();
   const { data: totalApplications } = useTotalApplications();
-  const { data: unitsData, isFetching } = useAllUnits(
-    page,
-    pageSize,
-    searchQuery
-  );
-
-  // Reset + merge data cleanly
-  useEffect(() => {
-    if (!unitsData) return;
-
-    // Reset when search changes
-    if (page === 1) {
-      setCompanies(unitsData.data || []);
-    } else {
-      // Append next page results
-      setCompanies((prev) => [...prev, ...(unitsData.data || [])]);
-    }
-
-    setTotalPages(unitsData.totalPages ?? null);
-  }, [unitsData]);
-
-  /** Intersection Observer for infinite scroll */
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isFetching) {
-          if (totalPages && page < totalPages) {
-            setPage((p) => p + 1);
-          }
-        }
-      },
-      { threshold: 1 }
-    );
-
-    const ref = loaderRef.current;
-    if (ref) observer.observe(ref);
-
-    return () => {
-      if (ref) observer.unobserve(ref);
-    };
-  }, [isFetching, totalPages]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -142,7 +108,7 @@ export default function CompanyManagement() {
           </div>
         </div>
 
-        {/* Company Management */}
+        {/* Company List */}
         <Card className="border border-border rounded-3xl">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -151,25 +117,38 @@ export default function CompanyManagement() {
               </h3>
               <div className="flex justify-between items-center">
                 <div className="relative">
-                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <SearchIcon className="absolute left-3 top-3.5 -translate-y-1/2 w-4 h-4 text-gray-400" />
 
                   <input
                     type="text"
                     placeholder="Search Companies"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-50 h-6 py-3 pl-8 pr-4 rounded-full border border-gray-400 focus:outline-none placeholder:text-[12px]"
+                    className="w-48 h-6 py-3 pl-8 pr-4 rounded-full border border-gray-400 focus:outline-none placeholder:text-[12px]"
                   />
                 </div>
 
-                <Button variant="link" className="text-primary">
-                  View all
-                </Button>
+                <button
+                  className="border px-4 rounded-full bg-teal-600 text-xs py-1.5 text-white ml-7 cursor-pointer"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  + Add Company
+                </button>
               </div>
             </div>
 
-            <div className="space-y-3">
-              {/* Render Loaded Companies */}
+            {/* 🔥 Infinite Scroll */}
+            <InfiniteScroll
+              dataLength={companies.length}
+              next={fetchNextPage}
+              hasMore={hasNextPage ?? false}
+              loader={<p className="py-4 text-center">Loading more...</p>}
+              endMessage={
+                <p className="py-4 text-center text-gray-400">
+                  No more companies.
+                </p>
+              }
+            >
               {companies.map((company, index) => (
                 <CompanyCard
                   key={index}
@@ -186,20 +165,14 @@ export default function CompanyManagement() {
                   status={"active"}
                 />
               ))}
-
-              {/* Infinite scroll loader */}
-              <div
-                ref={loaderRef}
-                className="py-6 text-center text-sm text-muted-foreground"
-              >
-                {isFetching
-                  ? "Loading more companies..."
-                  : page >= (totalPages || 0)
-                  ? "No more companies"
-                  : ""}
-              </div>
-            </div>
+            </InfiniteScroll>
           </div>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="max-h-[80vh] overflow-y-auto max-w-3xl">
+              <AddCompanyForm onClose={() => setIsDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </Card>
       </div>
     </div>
