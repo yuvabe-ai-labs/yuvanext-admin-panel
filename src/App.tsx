@@ -16,6 +16,8 @@ import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import CompanyManagement from "./pages/CompanyManagement";
+import Internships from "./pages/Internships";
+import InternshipDetailsPage from "@/components/InternshipDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +95,33 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CompanyManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships"
+              element={
+                <ProtectedRoute>
+                  <Internships />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships"
+              element={
+                <ProtectedRoute>
+                  <Internships />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships/:id"
+              element={
+                <ProtectedRoute>
+                  <InternshipDetailsPage />
                 </ProtectedRoute>
               }
             />
