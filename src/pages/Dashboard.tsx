@@ -17,17 +17,13 @@ import {
   calculateMonthlySignups,
   getNewProfilesThisMonth,
 } from "@/utils/dashboardUtils";
+import { format } from "date-fns";
 
 export default function Dashboard() {
   const { user, admin } = useAuth();
   const today = new Date();
 
-  const formattedDate = today.toLocaleDateString("en-US", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const formattedDate = format(today, "EEEE, dd MMMM yyyy");
 
   // Fetch data
   const { data: studentsData, isLoading: studentsLoading } = useAllStudents(

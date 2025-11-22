@@ -4,19 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useRef } from "react";
-
-interface UICandidate {
-  id: string;
-  name: string;
-  role: string;
-  location?: string | null;
-  bio?: string[] | string | null;
-  skills?: string[] | null;
-  avatar_url?: string | null;
-}
+import type { Candidate } from "@/types/profile.types";
 
 interface CandidateManagementProps {
-  candidates: UICandidate[];
+  candidates: Candidate[];
 }
 
 export default function CandidateManagement({
