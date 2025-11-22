@@ -1,10 +1,10 @@
 
 export class Unauthorized extends Error {
   statusCode?: number;
-  details?: any;
+  details?: string;
   code?: string;
 
-  constructor(message: string, statusCode?: number, details?: any) {
+  constructor(message: string, statusCode?: number, details?: string) {
     super(message);
     this.name = "AppError";
     this.statusCode = statusCode;

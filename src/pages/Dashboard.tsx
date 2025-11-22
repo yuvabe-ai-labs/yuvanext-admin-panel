@@ -1,80 +1,121 @@
 import { useAuth } from "@/hooks/useAuth";
+import Navbar from "@/components/Navbar";
+import { Card } from "@/components/ui/card";
+import { useMemo } from "react";
+import StatsGrid from "@/components/dashboard/StatsGrid";
+import PerformanceChart from "@/components/dashboard/PerformanceChart";
+import RecentCandidates from "@/components/dashboard/RecentCandidates";
+import RecentUnits from "@/components/dashboard/RecentUnits";
+import CompanyManagement from "@/components/dashboard/CompanyManagement";
+import CandidateManagement from "@/components/dashboard/CandidateManagement";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BarChart3, Users, Database, LogOut } from "lucide-react";
+import {
+  useAllStudents,
+  useAllUnits,
+  useProfileStats,
+} from "@/hooks/useProfile";
+import { useCandidates } from "@/hooks/useCandidates";
+import {
+  calculateMonthlySignups,
+  getNewProfilesThisMonth,
+} from "@/utils/dashboardUtils";
+import { format } from "date-fns";
 
 export default function Dashboard() {
-  const { user, admin, signOut } = useAuth();
+  const { user, admin } = useAuth();
+  const today = new Date();
+  const formattedDate = format(today, "EEEE, dd MMMM yyyy");
+
+  // Fetch units + students
+  const { data: studentsData, isLoading: studentsLoading } = useAllStudents(
+    1,
+    10
+  );
+  const { data: unitsData, isLoading: unitsLoading } = useAllUnits(1, 10);
+
+  const { data: allStudentsData } = useAllStudents(1, 1000);
+  const { data: allUnitsData } = useAllUnits(1, 1000);
+  const { data: profileStats } = useProfileStats();
+
+  // Fetch real candidates from Supabase
+  const { data: candidateData } = useCandidates();
+
+  const recentStudents = studentsData?.data || [];
+  const recentUnits = unitsData?.data || [];
+  const totalStudents =
+    allStudentsData?.count || profileStats?.totalStudents || 0;
+  const totalUnits = allUnitsData?.count || profileStats?.totalUnits || 0;
+
+  const newStudentsThisMonth = useMemo(
+    () => getNewProfilesThisMonth(allStudentsData?.data || []),
+    [allStudentsData]
+  );
+
+  const newUnitsThisMonth = useMemo(
+    () => getNewProfilesThisMonth(allUnitsData?.data || []),
+    [allUnitsData]
+  );
+
+  const performanceData = useMemo(
+    () =>
+      calculateMonthlySignups(
+        allStudentsData?.data || [],
+        allUnitsData?.data || []
+      ),
+    [allStudentsData, allUnitsData]
+  );
+
+  /** ⬇️ Supabase Candidate Profiles */
+  const candidateProfiles = candidateData?.data ?? [];
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Top bar */}
-      <header className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="min-h-screen bg-background">
+      <Navbar />
 
-        <Button variant="destructive" onClick={signOut} className="flex gap-2">
-          <LogOut size={18} />
-          Logout
-        </Button>
-      </header>
+      <div className="w-full mx-auto px-4 sm:px-12 lg:px-40 py-6 lg:py-10">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+          <h1 className="text-3xl font-bold">
+            Welcome back, {admin?.name || user?.email?.split("@")[0] || "Admin"}
+          </h1>
+        </div>
 
-      {/* Welcome */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold">
-          Welcome, {admin?.name || user?.email?.split("@")[0] || "Admin"} 👋
-        </h2>
-        <p className="text-muted-foreground mt-1">
-          You have full admin access.
-        </p>
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-4">
+            <Card className="border border-border rounded-3xl">
+              <div className="p-6">
+                <StatsGrid
+                  totalUnits={totalUnits}
+                  totalStudents={totalStudents}
+                  newUnitsThisMonth={newUnitsThisMonth}
+                  newStudentsThisMonth={newStudentsThisMonth}
+                />
+                <PerformanceChart data={performanceData} />
+              </div>
+            </Card>
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <RecentCandidates
+                students={recentStudents}
+                isLoading={studentsLoading}
+              />
+              <RecentUnits units={recentUnits} isLoading={unitsLoading} />
+            </div>
+
+            {/* Company Management */}
+            <CompanyManagement units={recentUnits} isLoading={unitsLoading} />
+          </div>
+        </div>
+
+        {/* Candidate Management - now using real candidates */}
+        <CandidateManagement candidates={candidateProfiles} />
       </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              Total Users
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">120</p>
-            <p className="text-muted-foreground">Across all roles</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="w-5 h-5 text-primary" />
-              Total Admins
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">5</p>
-            <p className="text-muted-foreground">Registered admins</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" />
-              System Health
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-green-500">Good</p>
-            <p className="text-muted-foreground">All services running</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-16 text-center text-muted-foreground">
-        © {new Date().getFullYear()} Admin Console
-      </footer>
     </div>
   );
 }

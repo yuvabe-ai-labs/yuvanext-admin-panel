@@ -15,6 +15,11 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
+import CompanyManagement from "./pages/CompanyManagement";
+import Internships from "./pages/Internships";
+import InternshipDetailsPage from "@/components/InternshipDetailsPage";
+import CandidateManagement from "./pages/CandidateManagement";
+import CandidateDetailPage from "@/pages/CandidateDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +88,60 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/company-management"
+              element={
+                <ProtectedRoute>
+                  <CompanyManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships"
+              element={
+                <ProtectedRoute>
+                  <Internships />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships"
+              element={
+                <ProtectedRoute>
+                  <Internships />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/internships/:id"
+              element={
+                <ProtectedRoute>
+                  <InternshipDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/candidate-management"
+              element={
+                <ProtectedRoute>
+                  <CandidateManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/candidate/:applicationId"
+              element={
+                <ProtectedRoute>
+                  <CandidateDetailPage />
                 </ProtectedRoute>
               }
             />
