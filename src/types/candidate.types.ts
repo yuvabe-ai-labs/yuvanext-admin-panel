@@ -24,6 +24,7 @@ export interface HiredCandidateProfile {
 
 export interface CandidateDetailedProfile {
   id: string;
+  profile_id: string; // Added profile_id
   full_name: string;
   phone: string | null;
   email: string | null;
@@ -39,4 +40,8 @@ export interface CandidateDetailedProfile {
   completed_courses: Json[];
   avatar_url: string | null;
   cover_letter: string | null;
+}
+
+export interface SuspendCandidateInput {
+  profileId: string;  
 }

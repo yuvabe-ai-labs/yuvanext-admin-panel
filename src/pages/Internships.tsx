@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Pagination from "@/components/Pagination";
+import CreateInternshipDialog from "@/components/CreateInternshipDialog";
 import {
   useInternships,
   useActiveJobCount,
@@ -18,7 +19,6 @@ import {
   Briefcase,
   ArrowLeft,
   Search,
-  Plus,
   Eye,
   Ban,
 } from "lucide-react";
@@ -179,10 +179,7 @@ export default function Internships() {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-              <Button className="bg-teal-600 hover:bg-teal-700 rounded-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Create New JD
-              </Button>
+              <CreateInternshipDialog />
             </div>
           </div>
 

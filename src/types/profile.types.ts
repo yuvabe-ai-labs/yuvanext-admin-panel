@@ -131,6 +131,8 @@ export interface Unit {
     avatar_url: string | null;
     address: string | null;
   } | null;
+  application_count?: number;        // total applications for this unit's internships
+  active_internships_count?: number; // total active internships for this unit
 }
 
 export interface PerformanceData {

@@ -4,7 +4,9 @@ import {
   getActiveJobCount, 
   getTotalApplications, 
   suspendInternship,
-  getInternshipById 
+  getInternshipById,
+  getUnits,
+  createInternshipForUnit
 } from "@/services/internship.service";
 import { toast } from "sonner";
 
@@ -54,5 +56,27 @@ export const useInternshipById = (internshipId: string) => {
     queryKey: ["internship", internshipId],
     queryFn: () => getInternshipById(internshipId),
     enabled: !!internshipId,
+  });
+};
+
+export const useUnits = () => {
+  return useQuery({
+    queryKey: ["units"],
+    queryFn: getUnits,
+  });
+};
+
+export const useCreateInternshipForUnit = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createInternshipForUnit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["internships"] });
+      toast.success("Internship created successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create internship: ${error.message}`);
+    },
   });
 };
