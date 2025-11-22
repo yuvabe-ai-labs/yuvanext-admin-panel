@@ -3,15 +3,7 @@ import { useInternshipById } from "@/hooks/useInternships";
 import type { InternshipDetailsView } from "@/types/internship.types";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  MapPin,
-  Clock,
-  IndianRupee,
-  Check,
-  Ban,
-  CheckCircle,
-} from "lucide-react";
+import { ArrowLeft, MapPin, Clock, IndianRupee, Check } from "lucide-react";
 
 export default function InternshipDetailsPage() {
   const { id } = useParams<{ id: string }>();
