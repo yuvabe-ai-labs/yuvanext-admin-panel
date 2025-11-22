@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import CompanyManagement from "./pages/CompanyManagement";
 import UnitView from "./pages/UnitView";
+import Courses from "./pages/Courses";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <UnitView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/courses"
+              element={
+                <ProtectedRoute>
+                  <Courses />
                 </ProtectedRoute>
               }
             />

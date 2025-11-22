@@ -4,7 +4,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import FilterIcon from "@/assets/filter.svg";
+import FilterIcon from "@/components/ui/custom-icons";
 import { useState, useRef, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -204,68 +204,6 @@ const Courses = () => {
       <div className="container px-4 sm:px-6 lg:px-30 py-4 lg:py-10">
         <div className="flex flex-col lg:flex-row gap-5">
           {/* Left Sidebar - Filters */}
-          <div className=" hidden w-full lg:w-80 bg-card pt-5 border border-gray-200 rounded-3xl lg:flex flex-col lg:h-[90vh] lg:sticky lg:top-6 mb-4 lg:mb-0">
-            <div className="flex items-center justify-between mb-4 px-6 py-3 border-b bg-card sticky top-0 z-10">
-              <h2 className="text-lg font-bold">Filters</h2>
-              <Button
-                variant="ghost"
-                className="text-primary text-sm font-medium"
-                onClick={resetFilters}
-              >
-                Reset all
-              </Button>
-            </div>
-
-            <div className="px-6 pb-6 overflow-y-auto flex-1 space-y-6">
-              <FilterSection
-                label="Course Providers"
-                searchValue={searchProviders}
-                onSearch={setSearchProviders}
-                list={uniqueProviderNames}
-                selected={filters.providers}
-                onToggle={(v: any) => toggleFilter("providers", v)}
-                showAll={showAllProviders}
-                setShowAll={setShowAllProviders}
-              />
-
-              <FilterSection
-                label="Course Title"
-                searchValue={searchTitles}
-                onSearch={setSearchTitles}
-                list={uniqueTitles}
-                selected={filters.titles}
-                onToggle={(v: any) => toggleFilter("titles", v)}
-                showAll={showAllTitles}
-                setShowAll={setShowAllTitles}
-              />
-
-              <div>
-                <Label className="text-sm font-medium text-gray-500 mb-3 block">
-                  Course Level
-                </Label>
-                <div className="space-y-3">
-                  {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                    <div key={level} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={filters.difficulty.includes(level)}
-                        onCheckedChange={() =>
-                          toggleFilter("difficulty", level)
-                        }
-                      />
-                      <span className="text-sm">{level}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <PostingDateFilter
-                filters={filters}
-                activeDateRange={activeDateRange}
-                onSelectDate={(range: any) => DateRange(range)}
-                onDateChange={setFilters}
-              />
-            </div>
-          </div>
           {showMobileFilters && (
             <>
               {/* Overlay */}
@@ -368,16 +306,16 @@ const Courses = () => {
                 className="text-primary text-xl font-medium"
                 onClick={() => setShowMobileFilters(true)}
               >
-                <img src={FilterIcon} alt="Filter" className="w-6 h-6" />
+                {/* <img src={FilterIcon} alt="Filter" className="w-6 h-6" /> */}
               </button>
             </div>
 
-            <div className="hidden lg:block mb-6">
+            {/* <div className="hidden lg:block mb-6">
               <h1 className="text-2xl text-gray-600 font-medium">
                 Explore {filteredCourses.length} Course
                 {filteredCourses.length !== 1 ? "s" : ""}
               </h1>
-            </div>
+            </div> */}
             {/* <div className="mb-4 sm:mb-6">
               <h1 className="text-xl sm:text-2xl text-gray-600 font-medium">
                 Explore {filteredCourses.length} Course
