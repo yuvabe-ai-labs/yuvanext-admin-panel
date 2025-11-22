@@ -4,11 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCandidateDetailedProfile } from "@/hooks/useCandidates";
+import {
+  useCandidateDetailedProfile,
+  useSuspendCandidate,
+} from "@/hooks/useCandidates";
 import {
   Mail,
   Phone,
-  MapPin,
   ArrowLeft,
   Loader2,
   Linkedin,
@@ -18,7 +20,20 @@ import {
   Youtube,
   Palette,
   Globe,
+  Download,
+  UserX,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function CandidateDetailPage() {
   const { applicationId } = useParams<{ applicationId: string }>();
@@ -26,6 +41,27 @@ export default function CandidateDetailPage() {
   const { data, isLoading, error } = useCandidateDetailedProfile(
     applicationId || ""
   );
+  const suspendMutation = useSuspendCandidate();
+
+  const handleSuspend = async () => {
+    if (!data?.data?.profile_id) {
+      console.error("Profile ID not found");
+      return;
+    }
+
+    try {
+      await suspendMutation.mutateAsync({ profileId: data.data.profile_id });
+      // Navigate back after successful suspension
+      navigate(-1);
+    } catch (error) {
+      console.error("Error suspending candidate:", error);
+    }
+  };
+
+  const handleDownloadProfile = () => {
+    // Implement download functionality
+    console.log("Download profile");
+  };
 
   if (isLoading) {
     return (
@@ -161,6 +197,57 @@ export default function CandidateDetailPage() {
                         <span>{profile.phone}</span>
                       </div>
                     )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <Button
+                      variant="default"
+                      onClick={handleDownloadProfile}
+                      className="gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Profile
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          className="gap-2"
+                          disabled={suspendMutation.isPending}
+                        >
+                          {suspendMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <UserX className="w-4 h-4" />
+                          )}
+                          Suspend Account
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you sure you want to suspend this account?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action will suspend {profile.full_name}'s
+                            account. They will not be able to access the
+                            platform until their account is reactivated. This
+                            action can be reversed later.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleSuspend}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Suspend Account
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

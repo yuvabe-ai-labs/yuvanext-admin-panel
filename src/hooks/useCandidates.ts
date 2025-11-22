@@ -1,5 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { getAllCandidates, getCandidateStats, getCandidateDetailedProfile, getHiredCandidates } from "@/services/candidate.service";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getAllCandidates,
+  getCandidateStats,
+  getCandidateDetailedProfile,
+  getHiredCandidates,
+  suspendCandidate,
+} from "@/services/candidate.service";
+import { toast } from "sonner";
 
 export const useCandidates = (page: number = 1, searchQuery: string = "") => {
   return useQuery({
@@ -27,5 +34,22 @@ export const useCandidateDetailedProfile = (applicationId: string) => {
     queryKey: ["candidateDetailedProfile", applicationId],
     queryFn: () => getCandidateDetailedProfile(applicationId),
     enabled: !!applicationId,
+  });
+};
+
+// New mutation hook to suspend candidate
+export const useSuspendCandidate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: suspendCandidate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["candidates"] });
+      queryClient.invalidateQueries({ queryKey: ["candidateStats"] });
+      toast.success("Candidate suspended successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to suspend candidate: ${error.message}`);
+    },
   });
 };
