@@ -16,6 +16,7 @@ import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import CompanyManagement from "./pages/CompanyManagement";
+import UnitView from "./pages/UnitView";
 
 const queryClient = new QueryClient();
 
@@ -78,7 +79,6 @@ const App = () => (
               }
             />
             <Route path="/unauthorized" element={<Unauthorized />} />
-
             <Route
               path="/dashboard"
               element={
@@ -87,7 +87,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/company-management"
               element={
@@ -96,10 +95,16 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
-            {/* Default route */}
+            <Route
+              path="/units/:id"
+              element={
+                <ProtectedRoute>
+                  <UnitView />
+                </ProtectedRoute>
+              }
+            />
+            ;{/* Default route */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>

@@ -1,5 +1,10 @@
 import Navbar from "@/components/Navbar";
-import { BagIcon, PasteIcon, ProfileIcon } from "@/components/ui/custom-icons";
+import {
+  BagIcon,
+  DoubleProfileIcon,
+  PasteIcon,
+  ProfileIcon,
+} from "@/components/ui/custom-icons";
 import {
   useActiveInternships,
   useProfileStats,
@@ -9,13 +14,9 @@ import { Card } from "@/components/ui/card";
 import CompanyCard from "@/components/CompanyCard";
 import { useState } from "react";
 import { SearchIcon } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import AddCompanyForm from "@/components/AddCompanyForm";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 // 🔥 NEW HOOK
 import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
@@ -51,10 +52,10 @@ export default function CompanyManagement() {
                 <p className="text-2xl font-medium text-gray-600 mb-1">
                   {profileStats?.registeredUnits}
                 </p>
-                <p className="text-xs text-blue-600">+{} new this month</p>
+                {/* <p className="text-xs text-blue-600">+{} new this month</p> */}
               </div>
               <div className="w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <ProfileIcon className="w-5 h-5 text-blue-600" />
+                <DoubleProfileIcon className="w-5 h-5 text-teal-800" />
               </div>
             </div>
 
@@ -67,10 +68,10 @@ export default function CompanyManagement() {
                 <p className="text-2xl font-medium text-gray-600 mb-1">
                   {profileStats?.activeUnits}
                 </p>
-                <p className="text-xs text-blue-600">+{} new this month</p>
+                {/* <p className="text-xs text-blue-600">+{} new this month</p> */}
               </div>
               <div className="w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <PasteIcon className="w-5 h-5 text-blue-600" />
+                <PasteIcon className="w-5 h-5 text-teal-800" />
               </div>
             </div>
 
@@ -83,10 +84,10 @@ export default function CompanyManagement() {
                 <p className="text-2xl font-medium text-gray-600 mb-1">
                   {activeInternships?.totalInternships}
                 </p>
-                <p className="text-xs text-blue-600">+{} new this month</p>
+                {/* <p className="text-xs text-blue-600">+{} new this month</p> */}
               </div>
               <div className="w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <ProfileIcon className="w-5 h-5 text-blue-600" />
+                <ProfileIcon className="w-5 h-5 text-teal-800" />
               </div>
             </div>
 
@@ -99,10 +100,10 @@ export default function CompanyManagement() {
                 <p className="text-2xl font-medium text-gray-600 mb-1">
                   {totalApplications?.totalApplications}
                 </p>
-                <p className="text-xs text-blue-600">+{} new this month</p>
+                {/* <p className="text-xs text-blue-600">+{} new this month</p> */}
               </div>
               <div className="w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <BagIcon className="w-5 h-5 text-blue-600" />
+                <BagIcon className="w-5 h-5 text-teal-800" />
               </div>
             </div>
           </div>
@@ -155,6 +156,7 @@ export default function CompanyManagement() {
                   name={company.unit_profile.unit_name || ""}
                   email={company.unit_profile.contact_email || ""}
                   logoUrl={company.unit_profile.avatar_url || ""}
+                  id={company.unit_profile.id}
                   applications={0}
                   activePosts={0}
                   joinDate={
@@ -170,6 +172,9 @@ export default function CompanyManagement() {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="max-h-[80vh] overflow-y-auto max-w-3xl">
+              <VisuallyHidden>
+                <DialogTitle>Add Company Details</DialogTitle>
+              </VisuallyHidden>
               <AddCompanyForm onClose={() => setIsDialogOpen(false)} />
             </DialogContent>
           </Dialog>

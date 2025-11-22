@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const companySchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -55,24 +56,63 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
     },
   });
 
-  const onSubmit = (data: CompanyFormType) => {
-    console.log("VALIDATED DATA:", data);
+  const onSubmit = async (data: CompanyFormType) => {
+    try {
+      const password = "Yuvanext@25";
+      const { data: user, error: userErr } = await supabase.auth.signUp({
+        email: data.companyEmail,
+        password,
+      });
 
-    // 🚨 Don't store in Supabase yet — we will do that later
-  };
+      if (userErr) throw userErr;
 
-  const abilities = watch("languageAbilities");
+      const userId = user?.user?.id;
 
-  const toggleAbility = (value: "read" | "write" | "speak") => {
-    if (abilities.includes(value)) {
-      setValue(
-        "languageAbilities",
-        abilities.filter((v) => v !== value)
+      const { data: unitData, error } = await supabase.rpc(
+        "create_unit" as any,
+        {
+          p_user_id: userId,
+          p_unit_name: data.companyName,
+          p_contact_email: data.companyEmail,
+          p_contact_phone: data.contactNumber,
+          p_address: data.address,
+          p_industry: data.industryType,
+          p_description: data.about,
+          p_is_aurovillian: data.companyType === "auroville",
+        }
       );
-    } else {
-      setValue("languageAbilities", [...abilities, value]);
+
+      console.log(unitData);
+
+      if (error) {
+        console.error(error);
+        alert("❌ Failed to create company.\n" + error.message);
+        console.log("❌ Failed to create company.\n" + error.message);
+        return;
+      }
+
+      console.log("Created Unit ID:", unitData);
+      alert("✅ Company successfully created!");
+
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Something went wrong.");
     }
   };
+
+  // const abilities = watch("languageAbilities");
+
+  // const toggleAbility = (value: "read" | "write" | "speak") => {
+  //   if (abilities.includes(value)) {
+  //     setValue(
+  //       "languageAbilities",
+  //       abilities.filter((v) => v !== value)
+  //     );
+  //   } else {
+  //     setValue("languageAbilities", [...abilities, value]);
+  //   }
+  // };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
@@ -191,7 +231,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Company Size */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <label className="font-bold text-gray-600 text-sm">
               Company Size *
             </label>
@@ -214,7 +254,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                 {errors.companySize.message}
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Address */}
           <div className="mb-5">
@@ -285,7 +325,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Language Select */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <label className="font-bold text-gray-600 text-sm">
               Language Preferred *
             </label>
@@ -300,10 +340,10 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                 {errors.language.message}
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Abilities */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <label className="font-bold text-gray-600 text-sm">Abilities</label>
             <div className="flex gap-4 mt-2">
               {["read", "write", "speak"].map((ability) => (
@@ -322,10 +362,10 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                 Select at least one ability
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Date */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <label className="font-bold text-gray-600 text-sm">
               Date of Registration *
             </label>
@@ -377,7 +417,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                 Complete registration date
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Terms */}
           <div>
@@ -405,14 +445,14 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              className="bg-transparent border border-gray-400 px-4 py-2 rounded-full"
+              className="bg-transparent text-sm border border-gray-400 px-4 py-2 rounded-full"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-full"
+              className="bg-blue-500 text-white text-sm px-4 py-1 rounded-full"
             >
               Save
             </button>
