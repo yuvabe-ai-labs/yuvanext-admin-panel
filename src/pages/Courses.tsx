@@ -4,7 +4,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import FilterIcon from "@/components/ui/custom-icons";
 import { useState, useRef, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";

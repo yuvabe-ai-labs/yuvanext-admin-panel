@@ -9,7 +9,6 @@ import {
   useActiveInternships,
   useProfileStats,
   useTotalApplications,
-  useUnitApplicationCount,
 } from "@/hooks/useProfile";
 import { Card } from "@/components/ui/card";
 import CompanyCard from "@/components/CompanyCard";
@@ -24,7 +23,6 @@ import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { id } from "date-fns/locale";
 
 export default function CompanyManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

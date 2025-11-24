@@ -8,14 +8,13 @@ import {
   getActiveInternships,
   getTotalApplications,
   getActiveCourses,
-  getHiredStats
+  getHiredStats,
 } from "@/services/profile.service";
 import type {
   StudentProfileData,
   UnitProfileData,
 } from "@/types/profile.types";
 import { getUnitApplicationCount } from "@/services/internship.service";
-import { suspendUnit } from "@/services/suspend.service";
 
 // GET ALL PROFILES
 export const useAllProfiles = (
