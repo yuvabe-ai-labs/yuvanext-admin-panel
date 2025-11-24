@@ -28,7 +28,7 @@ export interface CandidateDetailedProfile {
   full_name: string;
   phone: string | null;
   email: string | null;
-
+  is_suspended: boolean;
   internship_title: string;
 
   education: Json[];

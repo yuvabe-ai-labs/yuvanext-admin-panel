@@ -186,6 +186,7 @@ export const getCandidateDetailedProfile = async (applicationId: string) => {
         full_name,
         phone,
         email,
+        is_suspended,
         student_profile:student_profiles (
           education,
           projects,
@@ -216,7 +217,7 @@ export const getCandidateDetailedProfile = async (applicationId: string) => {
     full_name: data.profile?.full_name ?? "",
     phone: data.profile?.phone ?? "",
     email: data.profile?.email ?? "",
-
+    is_suspended: data.profile?.is_suspended ?? false,
     education: Array.isArray(sp?.education) ? sp.education : [],
     projects: Array.isArray(sp?.projects) ? sp.projects : [],
     skills: Array.isArray(sp?.skills) ? sp.skills : [],
@@ -238,6 +239,17 @@ export const suspendCandidate = async ({ profileId }: SuspendCandidateInput) => 
   const { data, error } = await supabase
     .from("profiles")
     .update({ is_suspended: true })
+    .eq("id", profileId)
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+export const retrieveCandidate = async ({ profileId }: SuspendCandidateInput) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ is_suspended: false })
     .eq("id", profileId)
     .select()
     .single();
