@@ -382,6 +382,7 @@ export type Database = {
           full_name: string
           gender: string | null
           id: string
+          is_suspended: boolean
           onboarding_completed: boolean | null
           phone: string | null
           role: string
@@ -395,6 +396,7 @@ export type Database = {
           full_name: string
           gender?: string | null
           id?: string
+          is_suspended?: boolean
           onboarding_completed?: boolean | null
           phone?: string | null
           role: string
@@ -408,6 +410,7 @@ export type Database = {
           full_name?: string
           gender?: string | null
           id?: string
+          is_suspended?: boolean
           onboarding_completed?: boolean | null
           phone?: string | null
           role?: string
@@ -795,6 +798,20 @@ export type Database = {
     }
     Functions: {
       close_expired_internships: { Args: never; Returns: undefined }
+      create_unit: {
+        Args: {
+          p_address: string
+          p_contact_email: string
+          p_contact_phone: string
+          p_description: string
+          p_industry: string
+          p_is_aurovillian: boolean
+          p_unit_name: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      is_admin: { Args: never; Returns: boolean }
       is_unit_user: { Args: never; Returns: boolean }
     }
     Enums: {
