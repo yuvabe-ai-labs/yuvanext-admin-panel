@@ -9,11 +9,12 @@ import {
   useActiveInternships,
   useProfileStats,
   useTotalApplications,
+  useUnitApplicationCount,
 } from "@/hooks/useProfile";
 import { Card } from "@/components/ui/card";
 import CompanyCard from "@/components/CompanyCard";
 import { useState } from "react";
-import { SearchIcon } from "lucide-react";
+import { ChevronLeft, SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import AddCompanyForm from "@/components/AddCompanyForm";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -21,6 +22,9 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 // 🔥 NEW HOOK
 import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { id } from "date-fns/locale";
 
 export default function CompanyManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -34,12 +38,23 @@ export default function CompanyManagement() {
   const { data: profileStats } = useProfileStats();
   const { data: activeInternships } = useActiveInternships();
   const { data: totalApplications } = useTotalApplications();
+  // const { data: UnitApplicationCount } = useUnitApplicationCount();
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-
       <div className="px-30 py-8">
+        <Button
+          onClick={handleBack}
+          className="mb-6 text-gray-600 border border-gray-200 bg-white hover:bg-white cursor-pointer"
+        >
+          <ChevronLeft /> Go Back
+        </Button>
+
         {/* TOP CARDS */}
         <div className="pb-8">
           <div className="grid grid-cols-4 gap-4">
@@ -157,6 +172,7 @@ export default function CompanyManagement() {
                   email={company.unit_profile.contact_email || ""}
                   logoUrl={company.unit_profile.avatar_url || ""}
                   id={company.unit_profile.id}
+                  profileId={company.unit_profile.profile_id}
                   applications={0}
                   activePosts={0}
                   joinDate={

@@ -3,16 +3,22 @@ import type { InternshipWithCount } from "@/types/internship.types";
 
 const ITEMS_PER_PAGE = 9;
 
-export const getAllInternships = async (page: number = 1, searchQuery: string = "") => {
+export const getAllInternships = async (
+  page: number = 1,
+  searchQuery: string = ""
+) => {
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
 
   let query = supabase
     .from("internships")
-    .select(`
+    .select(
+      `
       *,
       applications:applications(count)
-    `, { count: "exact" })
+    `,
+      { count: "exact" }
+    )
     .eq("status", "active");
 
   // Add search filter if searchQuery exists
@@ -34,13 +40,13 @@ export const getAllInternships = async (page: number = 1, searchQuery: string = 
     totalCount: count ?? 0,
     totalPages: Math.ceil((count ?? 0) / ITEMS_PER_PAGE),
     error,
-  };  
+  };
 };
 
 export const getActiveJobCount = async () => {
   const { count, error } = await supabase
     .from("internships")
-    .select("*", { count: "exact", head: true }) 
+    .select("*", { count: "exact", head: true })
     .eq("status", "active");
 
   return {
@@ -84,5 +90,29 @@ export const getInternshipById = async (internshipId: string) => {
   return {
     data,
     error,
+  };
+};
+
+export const getUnitApplicationCount = async (unitProfileId: string) => {
+  const { data, error } = await supabase
+    .from("internships")
+    .select(
+      `
+      id,
+      applications(count)
+    `
+    )
+    .eq("created_by", unitProfileId); // the unit's profile id
+
+  if (error) return { error, totalApplications: 0 };
+
+  // Sum all application counts
+  const totalApplications = data.reduce((sum, internship) => {
+    return sum + (internship.applications?.[0]?.count ?? 0);
+  }, 0);
+
+  return {
+    totalApplications,
+    error: null,
   };
 };

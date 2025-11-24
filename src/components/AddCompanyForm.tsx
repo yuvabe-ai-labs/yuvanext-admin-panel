@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const companySchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -18,7 +20,8 @@ const companySchema = z.object({
     .enum(["1-25", "26-50", "51-100", "101-200", "200+"])
     .refine((val) => val !== undefined, {
       message: "Company size is required",
-    }),
+    })
+    .optional(),
   address: z.string().min(1, "Address is required"),
   about: z.string().min(1, "About is required"),
   services: z.string().min(1, "Services offered is required"),
@@ -26,14 +29,16 @@ const companySchema = z.object({
 
   documents: z.array(z.any()).optional(), // file upload handling later
 
-  language: z.string().min(1, "Select a language"),
-  languageAbilities: z.array(z.enum(["read", "write", "speak"])),
+  language: z.string().min(1, "Select a language").optional(),
+  languageAbilities: z.array(z.enum(["read", "write", "speak"])).optional(),
 
-  registrationDate: z.object({
-    day: z.string().min(1, "Day required"),
-    month: z.string().min(1, "Month required"),
-    year: z.string().min(1, "Year required"),
-  }),
+  registrationDate: z
+    .object({
+      day: z.string().min(1, "Day required"),
+      month: z.string().min(1, "Month required"),
+      year: z.string().min(1, "Year required"),
+    })
+    .optional(),
 
   terms: z.boolean().refine((val) => val === true, {
     message: "You must accept terms and conditions",
@@ -55,8 +60,12 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
       languageAbilities: [],
     },
   });
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: CompanyFormType) => {
+    console.log("on submit triggered");
+    setLoading(true);
+
     try {
       const password = "Yuvanext@25";
       const { data: user, error: userErr } = await supabase.auth.signUp({
@@ -66,9 +75,12 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
 
       if (userErr) throw userErr;
 
-      const userId = user?.user?.id;
+      console.log("new user sign up created successfully");
 
-      const { data: unitData, error } = await supabase.rpc(
+      const userId = user?.user?.id ?? "";
+      console.log("USER ID:", userId);
+
+      const { data: unitData, error: unitError } = await supabase.rpc(
         "create_unit" as any,
         {
           p_user_id: userId,
@@ -81,23 +93,36 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
           p_is_aurovillian: data.companyType === "auroville",
         }
       );
+      console.log("Function call result:", unitData, unitError);
 
-      console.log(unitData);
-
-      if (error) {
-        console.error(error);
-        alert("❌ Failed to create company.\n" + error.message);
-        console.log("❌ Failed to create company.\n" + error.message);
+      if (unitError) {
+        console.error("UNIT CREATION ERROR:", unitError);
+        toast.error(unitError.message);
+        setLoading(false);
         return;
       }
-
       console.log("Created Unit ID:", unitData);
+
+      // send invite link to the new unit
+      // const { data: verifyRes, error: verifyError } =
+      //   await supabase.functions.invoke("send-verification-link", {
+      //     body: {
+      //       email: data.companyEmail,
+      //       password: "Yuvanext@25",
+      //       redirectUrl: "https://app.yuvanext.com/unit-dashboard",
+      //     },
+      //   });
+
+      // console.log("VERIFY RESPONSE:", verifyRes, verifyError);
+
       alert("✅ Company successfully created!");
 
       onClose();
     } catch (err) {
       console.error(err);
       alert("❌ Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,7 +140,10 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
   // };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, (err) => console.log("❌ Errors:", err))}
+      className="space-y-6 p-4"
+    >
       <div>
         <div className="mb-5">
           <h1 className="font-bold text-lg">Add Company</h1>
@@ -452,9 +480,12 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
 
             <button
               type="submit"
-              className="bg-blue-500 text-white text-sm px-4 py-1 rounded-full"
+              disabled={loading}
+              className={`bg-blue-500 text-white text-sm px-4 py-1 rounded-full cursor-pointer ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>

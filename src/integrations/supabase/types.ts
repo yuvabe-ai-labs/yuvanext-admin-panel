@@ -387,6 +387,7 @@ export type Database = {
           role: string;
           updated_at: string;
           user_id: string;
+          is_suspended: boolean;
         };
         Insert: {
           created_at?: string;
@@ -400,6 +401,7 @@ export type Database = {
           role: string;
           updated_at?: string;
           user_id: string;
+          is_suspended: boolean;
         };
         Update: {
           created_at?: string;
@@ -413,6 +415,7 @@ export type Database = {
           role?: string;
           updated_at?: string;
           user_id?: string;
+          is_suspended: boolean;
         };
         Relationships: [];
       };
@@ -702,6 +705,7 @@ export type Database = {
           updated_at: string;
           values: string | null;
           website_url: string | null;
+          is_suspended: boolean;
         };
         Insert: {
           address?: string | null;
@@ -728,6 +732,7 @@ export type Database = {
           updated_at?: string;
           values?: string | null;
           website_url?: string | null;
+          is_suspended: boolean;
         };
         Update: {
           address?: string | null;
@@ -754,6 +759,7 @@ export type Database = {
           updated_at?: string;
           values?: string | null;
           website_url?: string | null;
+          is_suspended: boolean;
         };
         Relationships: [
           {

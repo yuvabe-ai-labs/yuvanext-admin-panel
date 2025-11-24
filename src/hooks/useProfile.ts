@@ -12,6 +12,8 @@ import type {
   StudentProfileData,
   UnitProfileData,
 } from "@/types/profile.types";
+import { getUnitApplicationCount } from "@/services/internship.service";
+import { suspendUnit } from "@/services/suspend.service";
 
 // GET ALL PROFILES
 export const useAllProfiles = (
@@ -85,3 +87,21 @@ export const useTotalApplications = () => {
     queryFn: getTotalApplications,
   });
 };
+
+// GET PROFILE DETAILS BY ID
+export const useUnitApplicationCount = (unitId: string) => {
+  return useQuery({
+    queryKey: ["UnitApplicationCount", unitId],
+    queryFn: () => getUnitApplicationCount(unitId),
+    enabled: !!unitId,
+  });
+};
+
+// // GET PROFILE DETAILS BY ID
+// export const useSuspendUnit = (unitId: string) => {
+//   return useQuery({
+//     queryKey: ["suspendUnit", unitId],
+//     queryFn: () => suspendUnit(unitId),
+//     enabled: !!unitId,
+//   });
+// };

@@ -4,6 +4,8 @@ import { Ban, EyeIcon, Settings, UserRoundCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUnitApplicationCount } from "@/hooks/useProfile";
+import { suspendUnit } from "@/services/suspend.service";
 
 interface CompanyCardProps {
   name: string;
@@ -13,18 +15,19 @@ interface CompanyCardProps {
   joinDate: string;
   logoUrl?: string;
   id?: string;
+  profileId?: string;
   status: "active" | "inactive";
 }
 
 export default function CompanyCard({
   name,
   email,
-  applications,
   activePosts,
   joinDate,
   logoUrl,
   status,
   id,
+  profileId,
 }: CompanyCardProps) {
   const initials = name
     .split(" ")
@@ -32,6 +35,10 @@ export default function CompanyCard({
     .join("")
     .substring(0, 2);
   const navigate = useNavigate();
+  const { data: UnitApplicationCount } = useUnitApplicationCount(
+    profileId ?? ""
+  );
+  // const handleSuspend = useSuspendUnit(id || "");
   const [openMenuId, setOpenMenuId] = useState("");
 
   function handleToggle(id: string) {
@@ -55,7 +62,7 @@ export default function CompanyCard({
         </div>
         <p className="text-sm text-muted-foreground truncate mb-1">{email}</p>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>{applications} Applications</span>
+          <span>{UnitApplicationCount?.totalApplications} Applications</span>
           <span>{activePosts} Active Posts</span>
           <span>Joined {joinDate}</span>
         </div>
@@ -69,7 +76,7 @@ export default function CompanyCard({
             <div className="flex gap-2.5 items-center border-b border-gray-300 px-3 py-2">
               <EyeIcon className="w-5 h-5 text-gray-600" />
               <button
-                className="text-xs text-gray-600"
+                className="text-xs text-gray-600 cursor-pointer"
                 onClick={() => navigate(`/units/${id}`)}
               >
                 View Details
@@ -78,12 +85,19 @@ export default function CompanyCard({
 
             <div className="flex gap-2.5 items-center border-b border-gray-300 px-3 py-2">
               <UserRoundCog className="w-5 h-5 text-gray-600" />
-              <button className="text-xs text-gray-600">Manage Access</button>
+              <button className="text-xs text-gray-600 cursor-pointer">
+                Manage Access
+              </button>
             </div>
 
             <div className="flex gap-2.5 items-center px-3 py-2">
               <Ban className="w-5 h-5 text-red-500" />
-              <button className="text-xs text-red-500">Suspend Account</button>
+              <button
+                onClick={() => suspendUnit(id || "")}
+                className="text-xs text-red-500 cursor-pointer"
+              >
+                Suspend Account
+              </button>
             </div>
           </div>
         )}

@@ -14,6 +14,7 @@ import {
   ThreadIcon,
   TwitterIcon,
 } from "@/components/ui/custom-icons";
+import { suspendUnit } from "@/services/suspend.service";
 
 const safeParse = (data: any, fallback: any) => {
   if (!data) return fallback;
@@ -86,11 +87,11 @@ const UnitView = () => {
           <CardContent className="p-7.5">
             <div className="flex flex-col md:flex-row items-start gap-7">
               {/* Unit Logo */}
-              <div className="hidden md:block w-32 h-32 rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
+              <div className="hidden md:flex justify-center items-center w-32 h-32 rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
                 {(unit as any).avatar_url ? (
                   <img
                     src={(unit as any).avatar_url}
-                    // alt={unit.unit_name}
+                    alt={unit.unit_name || ""}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -102,7 +103,7 @@ const UnitView = () => {
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-foreground mb-2 flex gap-2.5">
                   {/* Unit Logo For Mobile*/}
-                  <div className="w-10 h-10 md:hidden rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
+                  <div className="w-10 h-10 flex justify-center items-center md:hidden rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
                     {(unit as any).avatar_url ? (
                       <img
                         src={(unit as any).avatar_url}
@@ -220,7 +221,11 @@ const UnitView = () => {
                       </a>
                     </button>
                   )}
-                  <button className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-red-500  cursor-pointer border-variable-collection-red-500 hover:bg-transparent">
+
+                  <button
+                    onClick={() => suspendUnit(id || "")}
+                    className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-red-500  cursor-pointer border-variable-collection-red-500 hover:bg-transparent"
+                  >
                     <Ban className="w-5 h-5 text-red-500" />
                     <span className=" font-medium text-red-500 text-2.5 text-center">
                       Suspend Account
@@ -297,7 +302,7 @@ const UnitView = () => {
                                 {/* View Button */}
                                 <Button
                                   variant="gradient"
-                                  className="rounded-full text-white invisible md:visible"
+                                  className="rounded-full text-white invisible md:visible cursor-pointer"
                                   onClick={() =>
                                     navigate(`/internships/${internship.id}`)
                                   }
