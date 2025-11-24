@@ -5,6 +5,7 @@ import {
   getCandidateDetailedProfile,
   getHiredCandidates,
   suspendCandidate,
+  retrieveCandidate
 } from "@/services/candidate.service";
 import { toast } from "sonner";
 
@@ -50,6 +51,22 @@ export const useSuspendCandidate = () => {
     },
     onError: (error: Error) => {
       toast.error(`Failed to suspend candidate: ${error.message}`);
+    },
+  });
+};
+
+export const useRetrieveCandidate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: retrieveCandidate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["candidates"] });
+      queryClient.invalidateQueries({ queryKey: ["candidateStats"] });
+      toast.success("Candidate account reactivated successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to reactivate candidate: ${error.message}`);
     },
   });
 };

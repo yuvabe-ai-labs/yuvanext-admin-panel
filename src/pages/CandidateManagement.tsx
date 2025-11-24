@@ -13,7 +13,13 @@ import {
   useCandidateStats,
   useHiredCandidates,
 } from "@/hooks/useCandidates";
+import {
+  useScheduledInterviews,
+  useInterviewStats,
+  // useCancelInterview,
+} from "@/hooks/useInterviews";
 import HiredCandidateCard from "@/components/HiredCandidateCard";
+import InterviewScheduledCard from "@/components/InterviewScheduledCard";
 
 export default function CandidateManagement() {
   const navigate = useNavigate();
@@ -32,27 +38,42 @@ export default function CandidateManagement() {
   const { data: hiredCandidatesData, isLoading: hiredCandidatesLoading } =
     useHiredCandidates(page, searchQuery);
 
+  const { data: interviewsData, isLoading: interviewsLoading } =
+    useScheduledInterviews(page, searchQuery);
+
   const { data: statsData } = useCandidateStats();
+  const { data: interviewStatsData } = useInterviewStats();
+  // const cancelInterviewMutation = useCancelInterview();
 
   const allCandidates = candidatesData?.data ?? [];
   const hiredCandidates = hiredCandidatesData?.data ?? [];
+  const scheduledInterviews = interviewsData?.data ?? [];
+
   const totalPages =
     activeTab === "hired"
       ? hiredCandidatesData?.totalPages ?? 1
+      : activeTab === "interviewed"
+      ? interviewsData?.totalPages ?? 1
       : candidatesData?.totalPages ?? 1;
 
   const totalCandidates = statsData?.totalCount ?? 0;
   const hiredCount = statsData?.hiredCount ?? 0;
-  const interviewScheduledCount = statsData?.interviewedCount ?? 0;
+  const interviewScheduledCount = interviewStatsData?.totalScheduled ?? 0;
   const shortlistedCount = statsData?.shortlistedCount ?? 0;
 
   const regularCandidates =
     activeTab === "all"
       ? allCandidates
-      : allCandidates.filter((c) => c.status === activeTab);
+      : activeTab === "shortlisted"
+      ? allCandidates.filter((c) => c.status === "shortlisted")
+      : [];
 
   const isLoading =
-    activeTab === "hired" ? hiredCandidatesLoading : candidatesLoading;
+    activeTab === "hired"
+      ? hiredCandidatesLoading
+      : activeTab === "interviewed"
+      ? interviewsLoading
+      : candidatesLoading;
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -223,7 +244,20 @@ export default function CandidateManagement() {
           {/* Loading */}
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">Loading candidates...</p>
+              <p className="text-gray-500">Loading...</p>
+            </div>
+          ) : activeTab === "interviewed" &&
+            scheduledInterviews.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-lg font-medium mb-2">
+                No Scheduled Interviews
+              </h3>
+              <p className="text-gray-500 text-sm">
+                {searchQuery
+                  ? "No interviews match your search criteria"
+                  : "No interviews have been scheduled yet"}
+              </p>
             </div>
           ) : activeTab === "hired" && hiredCandidates.length === 0 ? (
             <div className="text-center py-12">
@@ -237,7 +271,8 @@ export default function CandidateManagement() {
                   : "No candidates have been hired yet"}
               </p>
             </div>
-          ) : activeTab !== "hired" && regularCandidates.length === 0 ? (
+          ) : (activeTab === "all" || activeTab === "shortlisted") &&
+            regularCandidates.length === 0 ? (
             <div className="text-center py-12">
               <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <h3 className="text-lg font-medium mb-2">No Candidates Found</h3>
@@ -249,8 +284,29 @@ export default function CandidateManagement() {
             </div>
           ) : (
             <>
-              {/* Candidate List - Different layout for Hired tab */}
-              {activeTab === "hired" ? (
+              {/* Content based on active tab */}
+              {activeTab === "interviewed" ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {scheduledInterviews.map((interview) => (
+                    <InterviewScheduledCard
+                      key={interview.id}
+                      id={interview.application_id}
+                      student_name={interview.student_name}
+                      student_avatar_url={interview.student_avatar_url}
+                      internship_title={interview.internship_title}
+                      scheduled_date={interview.scheduled_date}
+                      duration_minutes={interview.duration_minutes}
+                      meeting_link={interview.meeting_link}
+                      unit_name={interview.unit_name}
+                      unit_avatar_url={interview.unit_avatar_url}
+                      description={interview.description}
+                      job_type={interview.job_type}
+                      duration={interview.duration}
+                      onViewProfile={(id) => navigate(`/candidate/${id}`)}
+                    />
+                  ))}
+                </div>
+              ) : activeTab === "hired" ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {hiredCandidates.map((candidate) => (
                     <HiredCandidateCard
