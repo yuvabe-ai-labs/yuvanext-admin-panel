@@ -20,10 +20,9 @@ export const getAllProfiles = async (
 
   if (role) query = query.eq("role", role);
 
-  if (searchTerm?.trim()) {
-    query = query.or(
-      `full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`
-    );
+  if (searchTerm) {
+    const s = searchTerm.trim().toLocaleLowerCase();
+    query = query.or(`full_name.ilike.%${s}%,email.ilike.%${s}%`);
   }
 
   const from = (page - 1) * pageSize;

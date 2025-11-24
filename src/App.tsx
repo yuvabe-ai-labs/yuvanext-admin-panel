@@ -16,6 +16,8 @@ import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import CompanyManagement from "./pages/CompanyManagement";
+import UnitView from "./pages/UnitView";
+import Courses from "./pages/Courses";
 import Internships from "./pages/Internships";
 import InternshipDetailsPage from "@/components/InternshipDetailsPage";
 import CandidateManagement from "./pages/CandidateManagement";
@@ -82,7 +84,6 @@ const App = () => (
               }
             />
             <Route path="/unauthorized" element={<Unauthorized />} />
-
             <Route
               path="/dashboard"
               element={
@@ -91,7 +92,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/company-management"
               element={
@@ -100,7 +100,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/internships"
               element={
@@ -109,7 +108,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/internships"
               element={
@@ -118,7 +116,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/internships/:id"
               element={
@@ -127,7 +124,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/candidate-management"
               element={
@@ -136,7 +132,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/candidate/:applicationId"
               element={
@@ -145,10 +140,24 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
-            {/* Default route */}
+            <Route
+              path="/units/:id"
+              element={
+                <ProtectedRoute>
+                  <UnitView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/courses"
+              element={
+                <ProtectedRoute>
+                  <Courses />
+                </ProtectedRoute>
+              }
+            />
+            ;{/* Default route */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
