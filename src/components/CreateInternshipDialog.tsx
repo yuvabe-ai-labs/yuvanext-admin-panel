@@ -95,7 +95,6 @@ export default function CreateInternshipDialog({
   });
 
   const jobTitle = watch("title");
-  const isPaid = watch("isPaid");
   const isJobRoleFilled = jobTitle && jobTitle.trim().length > 0;
 
   // Generate years (current year + next 2 years)
@@ -134,6 +133,8 @@ export default function CreateInternshipDialog({
     }
     return false;
   };
+
+  console.log(isPaidState);
 
   // Update application_deadline when date changes
   useEffect(() => {

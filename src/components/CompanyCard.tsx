@@ -1,7 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Settings } from "lucide-react";
+import { Ban, EyeIcon, Settings, UserRoundCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUnitApplicationCount } from "@/hooks/useProfile";
+import { suspendUnit } from "@/services/suspend.service";
 
 interface CompanyCardProps {
   name: string;
@@ -10,23 +14,36 @@ interface CompanyCardProps {
   activePosts: number;
   joinDate: string;
   logoUrl?: string;
+  id?: string;
+  profileId?: string;
   status: "active" | "inactive";
 }
 
 export default function CompanyCard({
   name,
   email,
-  applications,
   activePosts,
   joinDate,
   logoUrl,
   status,
+  id,
+  profileId,
 }: CompanyCardProps) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .substring(0, 2);
+  const navigate = useNavigate();
+  const { data: UnitApplicationCount } = useUnitApplicationCount(
+    profileId ?? ""
+  );
+  // const handleSuspend = useSuspendUnit(id || "");
+  const [openMenuId, setOpenMenuId] = useState("");
+
+  function handleToggle(id: string) {
+    setOpenMenuId(openMenuId === id ? "" : id);
+  }
 
   return (
     <div className="flex items-center gap-4 p-4 border border-border rounded-xl hover:shadow-sm transition-shadow">
@@ -45,14 +62,55 @@ export default function CompanyCard({
         </div>
         <p className="text-sm text-muted-foreground truncate mb-1">{email}</p>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>{applications} Applications</span>
+          <span>{UnitApplicationCount?.totalApplications} Applications</span>
           <span>{activePosts} Active Posts</span>
           <span>Joined {joinDate}</span>
         </div>
       </div>
-      <Button variant="ghost" size="icon" className="shrink-0">
-        <Settings className="h-4 w-4" />
-      </Button>
+
+      <div className="relative">
+        {openMenuId === email && (
+          <div
+            className={`absolute bg-white top-8 left-[-120px] border border-gray-200 rounded-xl shadow-lg z-50`}
+          >
+            <div className="flex gap-2.5 items-center border-b border-gray-300 px-3 py-2">
+              <EyeIcon className="w-5 h-5 text-gray-600" />
+              <button
+                className="text-xs text-gray-600 cursor-pointer"
+                onClick={() => navigate(`/units/${id}`)}
+              >
+                View Details
+              </button>
+            </div>
+
+            <div className="flex gap-2.5 items-center border-b border-gray-300 px-3 py-2">
+              <UserRoundCog className="w-5 h-5 text-gray-600" />
+              <button className="text-xs text-gray-600 cursor-pointer">
+                Manage Access
+              </button>
+            </div>
+
+            <div className="flex gap-2.5 items-center px-3 py-2">
+              <Ban className="w-5 h-5 text-red-500" />
+              <button
+                onClick={() => suspendUnit(id || "")}
+                className="text-xs text-red-500 cursor-pointer"
+              >
+                Suspend Account
+              </button>
+            </div>
+          </div>
+        )}
+
+        <Button
+          onClick={() => handleToggle(email)}
+          variant="ghost"
+          size="icon"
+          className="cursor-pointer"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
