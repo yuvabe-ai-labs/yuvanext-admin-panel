@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Unit } from "@/types/profile.types";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 interface CompanyManagementProps {
   units: Unit[];
@@ -54,17 +55,35 @@ export default function CompanyManagement({
                   </AvatarFallback>
                 </Avatar>
 
-                <div>
-                  <p className="font-medium">
-                    {unit.unit_profile?.unit_name || unit.profile.full_name}
-                  </p>
+                <div className="w-full">
+                  <div className="flex items-center">
+                    <p className="font-medium">
+                      {unit.unit_profile?.unit_name || unit.profile.full_name}
+                    </p>
+
+                    <Badge
+                      className={`ml-2 border-0 font-medium ${
+                        unit.profile.onboarding_completed
+                          ? "bg-green-500 hover:bg-green-500 text-white"
+                          : "bg-gray-300 hover:bg-gray-300 text-gray-700"
+                      }`}
+                    >
+                      {unit.profile.onboarding_completed
+                        ? "Active"
+                        : "Inactive"}
+                    </Badge>
+                  </div>
+
                   <p className="text-xs text-muted-foreground">
                     {unit.profile.email}
                   </p>
 
-                  <p className="text-xs text-muted-foreground">
-                    {unit.application_count ?? 0} Applications &nbsp;|&nbsp;{" "}
-                    {unit.active_internships_count ?? 0} Active Internships
+                  <p className="text-xs text-muted-foreground flex flex-wrap gap-4 pt-1">
+                    <span>{unit.application_count ?? 0} Applications</span>
+                    <span>
+                      {unit.active_internships_count ?? 0} Active Internships
+                    </span>
+                    <span>{unit.profile.created_at.split("T")[0]}</span>
                   </p>
                 </div>
               </div>

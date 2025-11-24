@@ -124,6 +124,8 @@ export interface Unit {
     id: string;
     full_name: string;
     email: string | null;
+    created_at: string;
+    onboarding_completed: boolean | null;
   };
   unit_profile: {
     unit_name: string | null;
