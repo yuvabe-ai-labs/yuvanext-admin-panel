@@ -1,5 +1,11 @@
+// internship.service.ts
 import { supabase } from "@/integrations/supabase/client";
-import type { InternshipWithCount } from "@/types/internship.types";
+import type {
+  InternshipWithCount,
+  Unit,
+  InternshipCreateInput,
+  Internship,
+} from "@/types/internship.types";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -21,7 +27,6 @@ export const getAllInternships = async (
     )
     .eq("status", "active");
 
-  // Add search filter if searchQuery exists
   if (searchQuery) {
     query = query.ilike("title", `%${searchQuery}%`);
   }
@@ -41,11 +46,13 @@ export const getAllInternships = async (
     totalPages: Math.ceil((count ?? 0) / ITEMS_PER_PAGE),
     error,
   };
+  };
 };
 
 export const getActiveJobCount = async () => {
   const { count, error } = await supabase
     .from("internships")
+    .select("*", { count: "exact", head: true })
     .select("*", { count: "exact", head: true })
     .eq("status", "active");
 
@@ -92,6 +99,47 @@ export const getInternshipById = async (internshipId: string) => {
     error,
   };
 };
+
+export const getUnits = async (): Promise<{ data: Unit[]; error: any }> => {
+  const { data, error } = await supabase
+    .from("units")
+    .select(`
+      id,
+      profile_id,
+      unit_name,
+      contact_email
+    `)
+    .order("unit_name", { ascending: true });
+
+  return { data: data ?? [], error };
+};
+
+// Updated: use new type InternshipCreateInput here, keeps original Internship separate
+export const createInternshipForUnit = async (internship: InternshipCreateInput) => {
+  const { data, error } = await supabase
+    .from("internships")
+    .insert({
+      title: internship.title,
+      company_name: internship.company_name,
+      duration: internship.duration,
+      payment: internship.payment ?? null,
+      job_type: internship.job_type ?? null,
+      min_age_required: internship.min_age_required ?? null,
+      description: internship.description,
+      responsibilities: internship.responsibilities ?? [],
+      benefits: internship.benefits ?? [],
+      skills_required: internship.skills_required ?? [],
+      application_deadline: internship.application_deadline ?? null,
+      created_by: internship.created_by,
+      status: internship.status ?? "draft",
+      posted_date: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  return { data, error };
+};
+
 
 export const getUnitApplicationCount = async (unitProfileId: string) => {
   const { data, error } = await supabase

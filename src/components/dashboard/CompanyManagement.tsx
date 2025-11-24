@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Unit } from "@/types/profile.types";
+import { useNavigate } from "react-router-dom";
 
 interface CompanyManagementProps {
   units: Unit[];
@@ -11,14 +12,21 @@ export default function CompanyManagement({
   units,
   isLoading,
 }: CompanyManagementProps) {
+  const navigate = useNavigate();
+
   return (
     <Card className="border border-border rounded-3xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Company Management</h3>
-        <button className="text-primary text-sm">View all</button>
+        <button
+          className="text-blue-600 underline text-sm hover:text-blue-800 cursor-pointer"
+          onClick={() => navigate("/company-management")}
+        >
+          View all
+        </button>
       </div>
 
-      <div className="h-[300px] overflow-y-auto space-y-4 scrollbar-hide">
+      <div className="h-[300px] overflow-y-auto space-y-0 scrollbar-hide">
         {isLoading ? (
           <p className="text-center text-sm text-muted-foreground py-8">
             Loading companies...
@@ -31,7 +39,7 @@ export default function CompanyManagement({
           units.map((unit) => (
             <div
               key={unit.profile.id}
-              className="flex justify-between items-center p-4 border rounded-xl hover:bg-gray-50 transition-colors"
+              className="flex justify-between items-center py-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
             >
               {/* Left section */}
               <div className="flex items-center gap-3">
@@ -53,20 +61,12 @@ export default function CompanyManagement({
                   <p className="text-xs text-muted-foreground">
                     {unit.profile.email}
                   </p>
-                </div>
-              </div>
 
-              {/* Right section */}
-              <div className="text-right">
-                <p className="text-sm text-primary font-medium">
-                  {unit.unit_profile?.unit_type || "Company"}
-                </p>
-
-                {unit.unit_profile?.address && (
                   <p className="text-xs text-muted-foreground">
-                    {unit.unit_profile.address}
+                    {unit.application_count ?? 0} Applications &nbsp;|&nbsp;{" "}
+                    {unit.active_internships_count ?? 0} Active Internships
                   </p>
-                )}
+                </div>
               </div>
             </div>
           ))

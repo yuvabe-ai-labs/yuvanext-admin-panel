@@ -1,11 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
-import {
-  useAllStudents,
-  useAllUnits,
-  useProfileStats,
-} from "@/hooks/useProfile";
 import { useMemo } from "react";
 import StatsGrid from "@/components/dashboard/StatsGrid";
 import PerformanceChart from "@/components/dashboard/PerformanceChart";
@@ -13,6 +8,13 @@ import RecentCandidates from "@/components/dashboard/RecentCandidates";
 import RecentUnits from "@/components/dashboard/RecentUnits";
 import CompanyManagement from "@/components/dashboard/CompanyManagement";
 import CandidateManagement from "@/components/dashboard/CandidateManagement";
+
+import {
+  useAllStudents,
+  useAllUnits,
+  useProfileStats,
+} from "@/hooks/useProfile";
+import { useCandidates } from "@/hooks/useCandidates";
 import {
   calculateMonthlySignups,
   getNewProfilesThisMonth,
@@ -22,20 +24,22 @@ import { format } from "date-fns";
 export default function Dashboard() {
   const { user, admin } = useAuth();
   const today = new Date();
-
   const formattedDate = format(today, "EEEE, dd MMMM yyyy");
 
-  // Fetch data
+  // Fetch units + students
   const { data: studentsData, isLoading: studentsLoading } = useAllStudents(
     1,
     10
   );
   const { data: unitsData, isLoading: unitsLoading } = useAllUnits(1, 10);
+
   const { data: allStudentsData } = useAllStudents(1, 1000);
   const { data: allUnitsData } = useAllUnits(1, 1000);
   const { data: profileStats } = useProfileStats();
 
-  // Computed values
+  // Fetch real candidates from Supabase
+  const { data: candidateData } = useCandidates();
+
   const recentStudents = studentsData?.data || [];
   const recentUnits = unitsData?.data || [];
   const totalStudents =
@@ -61,28 +65,8 @@ export default function Dashboard() {
     [allStudentsData, allUnitsData]
   );
 
-  const candidateProfiles = useMemo(
-    () =>
-      recentStudents.map((student) => ({
-        id: student.profile.id,
-        name: student.profile.full_name || "Unknown",
-        role:
-          student.student_profile?.profile_type || "Profile Type not specified",
-        location: student.student_profile?.location || "",
-        bio:
-          student.student_profile?.bio ||
-          "Passionate about creating user-centered digital experiences.",
-
-        skills: Array.isArray(student.student_profile?.skills)
-          ? student.student_profile!.skills.filter(
-              (s: unknown): s is string => typeof s === "string"
-            )
-          : [],
-
-        avatar_url: student.student_profile?.avatar_url,
-      })),
-    [recentStudents]
-  );
+  /** ⬇️ Supabase Candidate Profiles */
+  const candidateProfiles = candidateData?.data ?? [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,7 +100,6 @@ export default function Dashboard() {
 
           {/* RIGHT COLUMN */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Recent Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <RecentCandidates
                 students={recentStudents}
@@ -130,7 +113,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Candidate Management Section */}
+        {/* Candidate Management - now using real candidates */}
         <CandidateManagement candidates={candidateProfiles} />
       </div>
     </div>

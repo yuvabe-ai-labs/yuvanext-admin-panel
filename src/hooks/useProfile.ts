@@ -7,6 +7,8 @@ import {
   getProfileStats,
   getActiveInternships,
   getTotalApplications,
+  getActiveCourses,
+  getHiredStats
 } from "@/services/profile.service";
 import type {
   StudentProfileData,
@@ -77,6 +79,20 @@ export const useActiveInternships = () => {
   return useQuery({
     queryKey: ["activeInternships"],
     queryFn: getActiveInternships,
+  });
+};
+
+export const useActiveCourses = () => {
+  return useQuery({
+    queryKey: ["activeCourses"],
+    queryFn: getActiveCourses,
+  });
+};
+
+export const useHiredStats = () => {
+  return useQuery({
+    queryKey: ["hiredStats"],
+    queryFn: getHiredStats,
   });
 };
 
