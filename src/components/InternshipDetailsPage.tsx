@@ -3,7 +3,7 @@ import { useInternshipById } from "@/hooks/useInternships";
 import type { InternshipDetailsView } from "@/types/internship.types";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Clock, IndianRupee, Check } from "lucide-react";
+import { ChevronLeft, MapPin, Clock, IndianRupee, Check } from "lucide-react";
 
 export default function InternshipDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -57,13 +57,11 @@ export default function InternshipDetailsPage() {
         {/* Back Button */}
         <div className="flex items-center justify-between mb-8">
           <Button
-            variant="outline"
-            size="sm"
-            onClick={handleBack}
-            className="gap-2"
+            className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
+            onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-sm">Back</span>
           </Button>
         </div>
 

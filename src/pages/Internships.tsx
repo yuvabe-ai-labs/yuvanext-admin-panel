@@ -17,7 +17,7 @@ import {
   FileText,
   UserCheck,
   Briefcase,
-  ArrowLeft,
+  ChevronLeft,
   Search,
   Eye,
   Ban,
@@ -82,10 +82,10 @@ export default function Internships() {
 
       <div className="w-full mx-auto px-4 sm:px-12 lg:px-40 py-6 lg:py-10">
         <button
-          className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800"
+          className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
           onClick={() => navigate(-1)}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4" />
           <span className="text-sm">Back</span>
         </button>
 

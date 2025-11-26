@@ -4,6 +4,7 @@ export interface CandidateProfile {
   id: string;
   name: string;
   internship_title: string;
+  company_name: string | null;
   status: string;
   bio: any[] | null;
   skills: any[] | null;

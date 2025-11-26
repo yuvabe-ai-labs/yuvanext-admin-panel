@@ -34,24 +34,24 @@ export default function RecentCandidates({
 
               const fullName = profile?.full_name;
               const avatarUrl = student_profile?.avatar_url ?? undefined;
-              const headline = student_profile?.headline ?? null;
+              const profile_type = student_profile?.profile_type ?? null;
               const location = student_profile?.location ?? null;
 
               return (
                 <div key={profile.id} className="flex items-start gap-3 px-1">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-14 w-14">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="text-base">
                       {fullName.charAt(0)?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="flex-1 leading-tight">
+                  <div className="flex flex-col gap-0.5">
                     <p className="font-medium text-sm">{fullName}</p>
 
-                    {headline && (
+                    {profile_type && (
                       <p className="text-[12px] text-muted-foreground">
-                        {headline}
+                        {profile_type}
                       </p>
                     )}
 

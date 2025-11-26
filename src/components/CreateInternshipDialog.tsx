@@ -24,6 +24,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, X, Sparkles, ChevronDown } from "lucide-react";
 import { useCreateInternshipForUnit, useUnits } from "@/hooks/useInternships";
 import type { InternshipCreateInput } from "@/types/internship.types";
+import {
+  createInternshipSchema,
+  type CreateInternshipFormType,
+} from "@/lib/createInternshipSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface CreateInternshipDialogProps {
   children?: React.ReactNode;
@@ -75,7 +80,8 @@ export default function CreateInternshipDialog({
     setValue,
     watch,
     formState: { errors, isValid },
-  } = useForm<any>({
+  } = useForm<CreateInternshipFormType>({
+    resolver: zodResolver(createInternshipSchema),
     mode: "onChange",
     defaultValues: {
       title: "",
@@ -171,7 +177,7 @@ export default function CreateInternshipDialog({
     setValue("language_requirements", updatedLanguages);
   };
 
-  const handleAIAssist = async (field: string) => {
+  const handleAIAssist = async (field: keyof CreateInternshipFormType) => {
     if (!isJobRoleFilled) return;
 
     setAiLoading(field);

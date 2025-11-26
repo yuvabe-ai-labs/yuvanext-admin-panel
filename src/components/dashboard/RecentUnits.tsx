@@ -30,26 +30,26 @@ export default function RecentUnits({ units, isLoading }: RecentUnitsProps) {
               const unitName = unit_profile?.unit_name || profile?.full_name;
 
               const avatarUrl = unit_profile?.avatar_url ?? undefined;
-              const unitType = unit_profile?.unit_type ?? null;
+              // const unitType = unit_profile?.unit_type ?? null;
               const address = unit_profile?.address ?? null;
 
               return (
                 <div key={profile.id} className="flex items-start gap-3 px-1">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-14 w-14">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback>
                       {unitName.charAt(0)?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="flex-1 leading-tight">
+                  <div className="flex flex-col gap-0.5">
                     <p className="font-medium text-sm">{unitName}</p>
 
-                    {unitType && (
+                    {/* {unitType && (
                       <p className="text-[12px] text-muted-foreground">
                         {unitType}
                       </p>
-                    )}
+                    )} */}
 
                     {address && (
                       <p className="text-[11px] text-muted-foreground flex items-center gap-1">

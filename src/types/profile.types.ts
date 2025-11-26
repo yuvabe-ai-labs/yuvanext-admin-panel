@@ -124,8 +124,12 @@ export interface Unit {
     id: string;
     full_name: string;
     email: string | null;
+    created_at: string;
+    onboarding_completed: boolean | null;
+    is_suspended?: boolean;
   };
   unit_profile: {
+    id: string;
     unit_name: string | null;
     unit_type: string | null;
     avatar_url: string | null;

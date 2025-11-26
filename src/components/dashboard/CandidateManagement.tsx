@@ -44,7 +44,7 @@ export default function CandidateManagement({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Candidate Management</h3>
         <button
-          className="text-blue-600 font-medium text-sm hover:text-blue-800 cursor-pointer"
+          className="text-blue-600 font-semibold text-sm hover:text-blue-800 cursor-pointer"
           onClick={() => navigate("/candidate-management")}
         >
           View all
@@ -107,9 +107,13 @@ export default function CandidateManagement({
                         {application.name}
                       </h3>
 
-                      <p className="text-xs sm:text-sm text-muted-foreground mb-2 truncate">
+                      <p className="text-xs sm:text-sm text-gray-700 mb-2 truncate">
                         {application.internship_title}
                       </p>
+
+                      {/* <p className="text-xs sm:text-sm text-muted-foreground mb-2 truncate">
+                        {application.company_name}
+                      </p> */}
 
                       <Badge
                         className={`${getStatusColor(

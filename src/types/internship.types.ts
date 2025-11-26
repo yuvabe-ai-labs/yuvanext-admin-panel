@@ -3,8 +3,8 @@ export type status = "active" | "closed";
 export interface Unit {
   id: string;
   profile_id: string;
-  unit_name: string | null;      // nullable due to DB
-  contact_email?: string | null; // nullable
+  unit_name: string;
+  contact_email?: string;
 }
 
 export interface InternshipCreateInput {
@@ -23,7 +23,6 @@ export interface InternshipCreateInput {
   status?: "draft" | "active";
 }
 
-// Existing Internship interface unchanged
 export interface Internship {
   id: string;
   company_name: string;
@@ -32,8 +31,8 @@ export interface Internship {
   duration: string;
   status: status;
   created_at: string;
-  created_by: string; // profile_id of unit
-  unit?: Unit; // optional unit info
+  created_by: string; 
+  unit?: Unit; 
 }
 
 export interface InternshipWithCount extends Internship {
