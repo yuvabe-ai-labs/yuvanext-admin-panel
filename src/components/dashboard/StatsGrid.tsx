@@ -128,7 +128,7 @@ export default function StatsGrid({
       subtext: `+${activeCoursesThisMonth} new this month`,
       bgColor: "bg-indigo-50",
       isLoading: isLoadingCourses,
-      onClick: () => navigate("/course-management"),
+      onClick: () => navigate("/courses"),
     },
     {
       icon: Hired,

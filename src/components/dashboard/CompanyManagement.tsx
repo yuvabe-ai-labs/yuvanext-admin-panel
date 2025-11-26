@@ -19,7 +19,7 @@ export default function CompanyManagement({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Company Management</h3>
         <button
-          className="text-blue-600 underline text-sm hover:text-blue-800 cursor-pointer"
+          className="font-medium no-underline text-blue-600 text-sm hover:text-blue-800 cursor-pointer"
           onClick={() => navigate("/company-management")}
         >
           View all

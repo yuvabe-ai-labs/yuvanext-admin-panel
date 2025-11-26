@@ -50,7 +50,7 @@ export default function CompanyManagement() {
           onClick={handleBack}
           className="mb-6 text-gray-600 border border-gray-200 bg-white hover:bg-white cursor-pointer"
         >
-          <ChevronLeft /> Go Back
+          <ChevronLeft /> Back
         </Button>
 
         {/* TOP CARDS */}
@@ -164,22 +164,24 @@ export default function CompanyManagement() {
               }
             >
               {companies.map((company, index) => (
-                <CompanyCard
-                  key={index}
-                  name={company.unit_profile.unit_name || ""}
-                  email={company.unit_profile.contact_email || ""}
-                  logoUrl={company.unit_profile.avatar_url || ""}
-                  id={company.unit_profile.id}
-                  profileId={company.unit_profile.profile_id}
-                  applications={0}
-                  activePosts={0}
-                  joinDate={
-                    new Date(company.unit_profile.created_at)
-                      .toISOString()
-                      .split("T")[0]
-                  }
-                  status={"active"}
-                />
+                <div className="mb-2.5">
+                  <CompanyCard
+                    key={index}
+                    name={company.unit_profile.unit_name || ""}
+                    email={company.unit_profile.contact_email || ""}
+                    logoUrl={company.unit_profile.avatar_url || ""}
+                    id={company.unit_profile.id}
+                    profileId={company.unit_profile.profile_id}
+                    applications={0}
+                    activePosts={0}
+                    joinDate={
+                      new Date(company.unit_profile.created_at)
+                        .toISOString()
+                        .split("T")[0]
+                    }
+                    status={"active"}
+                  />
+                </div>
               ))}
             </InfiniteScroll>
           </div>

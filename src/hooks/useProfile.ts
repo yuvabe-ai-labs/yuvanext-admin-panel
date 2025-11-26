@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getAllProfiles,
   getProfileDetailsById,
@@ -9,12 +9,16 @@ import {
   getTotalApplications,
   getActiveCourses,
   getHiredStats,
+  getTotalInternshipByUnit,
+  getAllCourse,
 } from "@/services/profile.service";
 import type {
   StudentProfileData,
   UnitProfileData,
 } from "@/types/profile.types";
 import { getUnitApplicationCount } from "@/services/internship.service";
+import { toast } from "sonner";
+import { suspendCourse } from "@/services/suspendCousre.service";
 
 // GET ALL PROFILES
 export const useAllProfiles = (
@@ -65,6 +69,17 @@ export const useAllUnits = (
   });
 };
 
+export const useAllCourses = (
+  page: number = 1,
+  pageSize: number = 20,
+  searchTerm?: string
+) => {
+  return useQuery({
+    queryKey: ["units", page, pageSize, searchTerm],
+    queryFn: () => getAllCourse(page, pageSize, searchTerm),
+  });
+};
+
 // GET PROFILE STATISTICS
 export const useProfileStats = () => {
   return useQuery({
@@ -112,11 +127,32 @@ export const useUnitApplicationCount = (unitId: string) => {
   });
 };
 
-// // GET PROFILE DETAILS BY ID
-// export const useSuspendUnit = (unitId: string) => {
-//   return useQuery({
-//     queryKey: ["suspendUnit", unitId],
-//     queryFn: () => suspendUnit(unitId),
-//     enabled: !!unitId,
-//   });
-// };
+// GET INTERNSHIPS DETAILS BY UNIT
+export const useTotalInternshipByUnit = (unitId: string) => {
+  return useQuery({
+    queryKey: ["TotalInternshipByUnit", unitId],
+    queryFn: () => getTotalInternshipByUnit(unitId),
+    enabled: !!unitId,
+  });
+};
+
+export const useSuspendCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courseId: string) => suspendCourse(courseId),
+    onSuccess: () => {
+      // Invalidate and refetch relevant queries
+      queryClient.invalidateQueries({ queryKey: ["activeCourses"] });
+      // queryClient.invalidateQueries({ queryKey: ["activeJobCount"] });
+
+      // Show success notification
+      toast.success("Internship suspended successfully");
+    },
+
+    onError: (error: Error) => {
+      // Show error notification
+      toast.error(`Failed to suspend internship: ${error.message}`);
+    },
+  });
+};

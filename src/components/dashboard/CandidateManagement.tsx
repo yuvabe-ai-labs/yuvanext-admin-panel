@@ -44,7 +44,7 @@ export default function CandidateManagement({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Candidate Management</h3>
         <button
-          className="text-blue-600 underline text-sm hover:text-blue-800 cursor-pointer"
+          className="text-blue-600 font-medium text-sm hover:text-blue-800 cursor-pointer"
           onClick={() => navigate("/candidate-management")}
         >
           View all
@@ -127,7 +127,7 @@ export default function CandidateManagement({
                   </p>
 
                   {/* Skills */}
-                  <div className="min-h-[28px]">
+                  <div className="min-h-7">
                     {skills.length > 0 && (
                       <div className="flex gap-2 overflow-hidden">
                         {skills.length > 3 ? (
