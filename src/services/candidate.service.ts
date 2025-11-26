@@ -18,7 +18,8 @@ export const getAllCandidates = async (
       status,
       applied_date,
       internship:internships (
-        title
+        title,
+        company_name
       ),
       profile:profiles!inner (
         full_name,
@@ -54,6 +55,7 @@ export const getAllCandidates = async (
         id: item.id,
         name: item.profile?.full_name ?? "",
         internship_title: item.internship?.title ?? "",
+        company_name: item.internship?.company_name ?? "",
         status: item.status,
         bio: item.profile?.student_profile?.bio ?? null,
         skills: Array.isArray(rawSkills) ? rawSkills : [],
