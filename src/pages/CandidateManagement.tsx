@@ -144,7 +144,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-orange-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Registered Candidates
@@ -168,7 +168,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-cyan-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Hired by Units
@@ -194,7 +194,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-blue-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Interview Scheduled
@@ -218,7 +218,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-cyan-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Shortlisted candidates
@@ -237,7 +237,7 @@ export default function CandidateManagement() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="px-10">
           {/* Tab Heading and Search */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">

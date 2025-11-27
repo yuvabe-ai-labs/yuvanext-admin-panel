@@ -56,13 +56,13 @@ export default function InternshipDetailsPage() {
       <main className="p-6 max-w-7xl mx-auto">
         {/* Back Button */}
         <div className="flex items-center justify-between mb-8">
-          <Button
+          <button
             className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
             onClick={() => navigate(-1)}
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="text-sm">Back</span>
-          </Button>
+          </button>
         </div>
 
         {/* Main Card */}

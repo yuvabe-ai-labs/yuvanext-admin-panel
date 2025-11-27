@@ -29,6 +29,8 @@ import {
   type CreateInternshipFormType,
 } from "@/lib/createInternshipSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CreateInternshipDialogProps {
   children?: React.ReactNode;
@@ -177,33 +179,107 @@ export default function CreateInternshipDialog({
     setValue("language_requirements", updatedLanguages);
   };
 
-  const handleAIAssist = async (field: keyof CreateInternshipFormType) => {
-    if (!isJobRoleFilled) return;
+  const handleAIAssist = async (fieldName: keyof CreateInternshipFormType) => {
+    console.log("AI Assist triggered for:", fieldName);
+    setAiLoading(fieldName as string);
 
-    setAiLoading(field);
+    try {
+      const currentValue = watch(fieldName) as string;
+      const jobTitle = watch("title") || "this position";
 
-    // Simulate AI generation - replace with actual API call
-    setTimeout(() => {
-      let generatedText = "";
+      let prompt = "";
 
-      switch (field) {
+      switch (fieldName) {
         case "description":
-          generatedText = `We are seeking a talented ${jobTitle} to join our team. This role offers an excellent opportunity to work on challenging projects and develop your skills in a professional environment.`;
+          prompt = `Write a single, concise, professional paragraph describing a ${jobTitle} internship.
+Avoid introductions like "Here's a draft" or "About the internship".
+Focus only on what the intern will be doing and learning, in 5–7 lines.
+Return ONLY the paragraph text, no titles, no markdown.${
+            currentValue
+              ? ` Rewrite and improve this existing description: "${currentValue}".`
+              : ""
+          }`;
           break;
+
         case "responsibilities":
-          generatedText = `• Collaborate with team members on various projects\n• Contribute to the development and implementation of solutions\n• Participate in team meetings and brainstorming sessions\n• Learn and apply industry best practices`;
+          prompt = `Write 5–7 responsibilities for a ${jobTitle} internship.
+Each responsibility should be on a new line.
+Do NOT use numbering, bullets, markdown, or intro text.
+Return ONLY the list, one responsibility per line.${
+            currentValue
+              ? ` Rewrite and clean this existing list: "${currentValue}".`
+              : ""
+          }`;
           break;
+
         case "benefits":
-          generatedText = `• Certificate of completion\n• Letter of recommendation\n• Hands-on experience with real projects\n• Mentorship from experienced professionals\n• Networking opportunities`;
+          prompt = `List 4–6 post-internship benefits for a ${jobTitle} internship.
+Return ONLY the list, one benefit per line, with no extra text or introductions.`;
           break;
+
         case "skills_required":
-          generatedText = `• Strong communication skills\n• Ability to work in a team\n• Problem-solving mindset\n• Eagerness to learn\n• Attention to detail`;
+          prompt = `List 5–8 essential skills required for a ${jobTitle} internship.
+Return ONLY the list, one skill per line, with no introductions or extra text.${
+            currentValue ? ` Clean and rewrite: "${currentValue}".` : ""
+          }`;
           break;
+
+        default:
+          prompt = `Improve the following content for a ${jobTitle} internship: ${currentValue}`;
       }
 
-      setValue(field, generatedText);
+      // 🔥 Supabase Edge Function Call
+      const { data: aiResponse, error } = await supabase.functions.invoke(
+        "gemini-chat",
+        {
+          body: {
+            message: prompt,
+            userRole: "jd_generation",
+          },
+        }
+      );
+
+      if (error) throw error;
+
+      if (!aiResponse?.response) {
+        console.error("AI response in unexpected format:", aiResponse);
+        toast.error("AI returned an empty response. Try again.");
+        return;
+      }
+
+      let cleanResponse = aiResponse.response
+        .replace(/\*\*/g, "")
+        .replace(/\*/g, "")
+        .replace(/^#+\s*/gm, "")
+        .replace(/^here('|’)s.*\n/i, "")
+        .replace(/^about.*internship.*\n?/i, "")
+        .trim();
+
+      // 🎯 Specific cleanup based on field
+      if (fieldName === "description") {
+        cleanResponse = cleanResponse.split(/\n\s*\n/)[0].trim();
+      }
+
+      if (
+        ["responsibilities", "benefits", "skills_required"].includes(fieldName)
+      ) {
+        cleanResponse = cleanResponse
+          .split(/\n+/)
+          .map((line: string) => line.replace(/^[-•\d.]\s*/, "").trim())
+          .filter((line: string | any[]) => line.length > 0)
+          .join("\n");
+      }
+
+      // ✔ update form
+      setValue(fieldName, cleanResponse, { shouldValidate: true });
+
+      toast.success("AI-generated content added successfully!");
+    } catch (error) {
+      console.error("AI Assist Error:", error);
+      toast.error("Something went wrong. Try again.");
+    } finally {
       setAiLoading(null);
-    }, 1500);
+    }
   };
 
   const onSubmit = (data: any) => {

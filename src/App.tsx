@@ -19,7 +19,7 @@ import CompanyManagement from "./pages/CompanyManagement";
 import UnitView from "./pages/UnitView";
 import Courses from "./pages/Courses";
 import Internships from "./pages/Internships";
-import InternshipDetailsPage from "@/components/InternshipDetailsPage";
+import InternshipDetailsPage from "@/pages/InternshipDetailsPage";
 import CandidateManagement from "./pages/CandidateManagement";
 import CandidateDetailPage from "@/pages/CandidateDetailPage";
 

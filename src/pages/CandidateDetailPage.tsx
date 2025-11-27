@@ -154,13 +154,13 @@ export default function CandidateDetailPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button
+          <button
             className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
             onClick={() => navigate(-1)}
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="text-sm">Back</span>
-          </Button>
+          </button>
           <h1 className="text-2xl font-bold text-center flex-1">
             Applied for "{profile.internship_title}"
           </h1>

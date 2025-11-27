@@ -92,7 +92,7 @@ export default function Internships() {
         {/* Stats Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Total Active Jobs
@@ -109,7 +109,7 @@ export default function Internships() {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Total Applications
@@ -126,7 +126,7 @@ export default function Internships() {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   JD Analytics
@@ -143,7 +143,7 @@ export default function Internships() {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Candidate's Reports
