@@ -12,7 +12,6 @@ import {
 import {
   Mail,
   Phone,
-  ArrowLeft,
   Loader2,
   Linkedin,
   Instagram,
@@ -25,6 +24,7 @@ import {
   MapPin,
   Ban,
   UserCheck,
+  ChevronLeft,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -55,7 +55,6 @@ export default function CandidateDetailPage() {
 
     try {
       await suspendMutation.mutateAsync({ profileId: data.data.profile_id });
-      navigate(-1);
     } catch (error) {
       console.error("Error suspending candidate:", error);
     }
@@ -69,7 +68,6 @@ export default function CandidateDetailPage() {
 
     try {
       await retrieveMutation.mutateAsync({ profileId: data.data.profile_id });
-      navigate(-1);
     } catch (error) {
       console.error("Error retrieving candidate:", error);
     }
@@ -98,11 +96,11 @@ export default function CandidateDetailPage() {
           <Card className="p-6">
             <p className="text-red-600">Error loading candidate profile</p>
             <Button
-              variant="outline"
+              className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
               onClick={() => navigate(-1)}
-              className="mt-4"
             >
-              Go Back
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-sm">Back</span>
             </Button>
           </Card>
         </div>
@@ -156,14 +154,13 @@ export default function CandidateDetailPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="ghost"
+          <button
+            className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
             onClick={() => navigate(-1)}
-            className="gap-2 flex items-center"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-sm">Back</span>
+          </button>
           <h1 className="text-2xl font-bold text-center flex-1">
             Applied for "{profile.internship_title}"
           </h1>
@@ -210,8 +207,7 @@ export default function CandidateDetailPage() {
                     {profile.full_name}
                   </h2>
                   <p className="text-gray-600 mb-4 leading-relaxed">
-                    {profile.cover_letter ||
-                      "Passionate UI/UX designer with 3+ years of experience creating user-centered digital experiences. I believe in the power of design to solve real-world problems and create meaningful connections between people and technology."}
+                    {profile.cover_letter}
                   </p>
 
                   <div className="flex flex-wrap gap-6 text-sm text-gray-600 mb-5">

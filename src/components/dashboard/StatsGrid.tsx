@@ -142,7 +142,7 @@ export default function StatsGrid({
     {
       icon: Platformhealth,
       label: "Platform Health",
-      value: "98%",
+      value: "97%",
       subtext: "Stable this month",
       bgColor: "bg-teal-50",
       isLoading: false,

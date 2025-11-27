@@ -17,11 +17,8 @@ import { ChevronLeft, SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import AddCompanyForm from "@/components/AddCompanyForm";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
-// 🔥 NEW HOOK
 import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export default function CompanyManagement() {
@@ -38,20 +35,18 @@ export default function CompanyManagement() {
   const { data: totalApplications } = useTotalApplications();
   // const { data: UnitApplicationCount } = useUnitApplicationCount();
   const navigate = useNavigate();
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="px-30 py-8">
-        <Button
-          onClick={handleBack}
-          className="mb-6 text-gray-600 border border-gray-200 bg-white hover:bg-white cursor-pointer"
+        <button
+          className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
+          onClick={() => navigate(-1)}
         >
-          <ChevronLeft /> Go Back
-        </Button>
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-sm">Back</span>
+        </button>
 
         {/* TOP CARDS */}
         <div className="pb-8">

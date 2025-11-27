@@ -5,7 +5,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Pagination from "@/components/Pagination";
-import { Search, Users, Briefcase, UserCheck, Calendar } from "lucide-react";
+import {
+  Search,
+  Users,
+  Briefcase,
+  UserCheck,
+  Calendar,
+  ChevronLeft,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -120,6 +127,13 @@ export default function CandidateManagement() {
       <Navbar />
 
       <div className="w-full mx-auto px-4 sm:px-12 lg:px-40 py-6 lg:py-10">
+        <button
+          className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 bg-white "
+          onClick={() => navigate(-1)}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-sm">Back</span>
+        </button>
         {/* Tab Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div
@@ -130,7 +144,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-orange-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Registered Candidates
@@ -154,7 +168,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-cyan-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Hired by Units
@@ -180,7 +194,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-blue-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Interview Scheduled
@@ -204,7 +218,7 @@ export default function CandidateManagement() {
                 : "border-gray-200 hover:border-cyan-300"
             }`}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   Shortlisted candidates
@@ -223,7 +237,7 @@ export default function CandidateManagement() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="px-10">
           {/* Tab Heading and Search */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">

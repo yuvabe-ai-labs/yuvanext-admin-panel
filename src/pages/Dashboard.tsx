@@ -75,7 +75,7 @@ export default function Dashboard() {
       <div className="w-full mx-auto px-4 sm:px-12 lg:px-40 py-6 lg:py-10">
         {/* Header */}
         <div className="mb-8">
-          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+          <p className="text-lg text-muted-foreground">{formattedDate}</p>
           <h1 className="text-3xl font-bold">
             Welcome back, {admin?.name || user?.email?.split("@")[0] || "Admin"}
           </h1>

@@ -38,7 +38,6 @@ export const useCandidateDetailedProfile = (applicationId: string) => {
   });
 };
 
-// New mutation hook to suspend candidate
 export const useSuspendCandidate = () => {
   const queryClient = useQueryClient();
 
@@ -47,6 +46,8 @@ export const useSuspendCandidate = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["candidates"] });
       queryClient.invalidateQueries({ queryKey: ["candidateStats"] });
+      queryClient.invalidateQueries({ queryKey: ["units"] }); 
+      queryClient.invalidateQueries({ queryKey: ["candidateDetailedProfile"]})
       toast.success("Candidate suspended successfully");
     },
     onError: (error: Error) => {
@@ -63,6 +64,8 @@ export const useRetrieveCandidate = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["candidates"] });
       queryClient.invalidateQueries({ queryKey: ["candidateStats"] });
+      queryClient.invalidateQueries({ queryKey: ["units"] });
+      queryClient.invalidateQueries({ queryKey: ["candidateDetailedProfile"]})
       toast.success("Candidate account reactivated successfully");
     },
     onError: (error: Error) => {
