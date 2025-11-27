@@ -151,6 +151,7 @@ export type Database = {
           enrolled_count: number | null;
           id: string;
           image_url: string | null;
+          is_suspended: boolean;
           provider: string | null;
           status: Database["public"]["Enums"]["course_status"];
           title: string;
@@ -167,6 +168,7 @@ export type Database = {
           enrolled_count?: number | null;
           id?: string;
           image_url?: string | null;
+          is_suspended?: boolean;
           provider?: string | null;
           status?: Database["public"]["Enums"]["course_status"];
           title: string;
@@ -183,6 +185,7 @@ export type Database = {
           enrolled_count?: number | null;
           id?: string;
           image_url?: string | null;
+          is_suspended?: boolean;
           provider?: string | null;
           status?: Database["public"]["Enums"]["course_status"];
           title?: string;

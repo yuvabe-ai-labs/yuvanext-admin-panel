@@ -1,10 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Ban, EyeIcon, Settings, UserRoundCog } from "lucide-react";
+import { Ban, EyeIcon, EllipsisVertical, UserRoundCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUnitApplicationCount } from "@/hooks/useProfile";
+import {
+  useTotalInternshipByUnit,
+  useUnitApplicationCount,
+} from "@/hooks/useProfile";
 import { suspendUnit } from "@/services/suspend.service";
 
 interface CompanyCardProps {
@@ -22,7 +25,6 @@ interface CompanyCardProps {
 export default function CompanyCard({
   name,
   email,
-  activePosts,
   joinDate,
   logoUrl,
   status,
@@ -38,7 +40,10 @@ export default function CompanyCard({
   const { data: UnitApplicationCount } = useUnitApplicationCount(
     profileId ?? ""
   );
-  // const handleSuspend = useSuspendUnit(id || "");
+  const { data: TotalInternshipByUnit } = useTotalInternshipByUnit(
+    profileId ?? ""
+  );
+
   const [openMenuId, setOpenMenuId] = useState("");
 
   function handleToggle(id: string) {
@@ -63,7 +68,9 @@ export default function CompanyCard({
         <p className="text-sm text-muted-foreground truncate mb-1">{email}</p>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>{UnitApplicationCount?.totalApplications} Applications</span>
-          <span>{activePosts} Active Posts</span>
+          <span>
+            {TotalInternshipByUnit?.totalInternshipsByUnit} Active Posts
+          </span>
           <span>Joined {joinDate}</span>
         </div>
       </div>
@@ -108,7 +115,7 @@ export default function CompanyCard({
           size="icon"
           className="cursor-pointer"
         >
-          <Settings className="h-4 w-4" />
+          <EllipsisVertical className="h-4 w-4" />
         </Button>
       </div>
     </div>

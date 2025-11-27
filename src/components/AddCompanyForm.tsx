@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -67,77 +66,38 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
     setLoading(true);
 
     try {
-      const password = "Yuvanext@25";
-      const { data: user, error: userErr } = await supabase.auth.signUp({
-        email: data.companyEmail,
-        password,
-      });
-
-      if (userErr) throw userErr;
-
-      console.log("new user sign up created successfully");
-
-      const userId = user?.user?.id ?? "";
-      console.log("USER ID:", userId);
-
-      const { data: unitData, error: unitError } = await supabase.rpc(
-        "create_unit" as any,
+      const res = await fetch(
+        "https://gldmszykmzbbsljxtnyp.supabase.co/functions/v1/create-unit",
         {
-          p_user_id: userId,
-          p_unit_name: data.companyName,
-          p_contact_email: data.companyEmail,
-          p_contact_phone: data.contactNumber,
-          p_address: data.address,
-          p_industry: data.industryType,
-          p_description: data.about,
-          p_is_aurovillian: data.companyType === "auroville",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+            }`, // ← REQUIRED
+          },
+          body: JSON.stringify(data),
         }
       );
-      console.log("Function call result:", unitData, unitError);
 
-      if (unitError) {
-        console.error("UNIT CREATION ERROR:", unitError);
-        toast.error(unitError.message);
-        setLoading(false);
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error(result.error);
+        toast.error(result.error);
         return;
       }
-      console.log("Created Unit ID:", unitData);
 
-      // send invite link to the new unit
-      // const { data: verifyRes, error: verifyError } =
-      //   await supabase.functions.invoke("send-verification-link", {
-      //     body: {
-      //       email: data.companyEmail,
-      //       password: "Yuvanext@25",
-      //       redirectUrl: "https://app.yuvanext.com/unit-dashboard",
-      //     },
-      //   });
-
-      // console.log("VERIFY RESPONSE:", verifyRes, verifyError);
-
-      alert("✅ Company successfully created!");
+      toast.success("Company created!");
 
       onClose();
     } catch (err) {
       console.error(err);
-      alert("❌ Something went wrong.");
+      toast.success("❌ Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
-
-  // const abilities = watch("languageAbilities");
-
-  // const toggleAbility = (value: "read" | "write" | "speak") => {
-  //   if (abilities.includes(value)) {
-  //     setValue(
-  //       "languageAbilities",
-  //       abilities.filter((v) => v !== value)
-  //     );
-  //   } else {
-  //     setValue("languageAbilities", [...abilities, value]);
-  //   }
-  // };
 
   return (
     <form

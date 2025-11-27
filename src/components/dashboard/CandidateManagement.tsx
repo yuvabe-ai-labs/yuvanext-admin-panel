@@ -131,7 +131,7 @@ export default function CandidateManagement({
                   </p>
 
                   {/* Skills */}
-                  <div className="min-h-[28px]">
+                  <div className="min-h-7">
                     {skills.length > 0 && (
                       <div className="flex gap-2 overflow-hidden">
                         {skills.length > 3 ? (
