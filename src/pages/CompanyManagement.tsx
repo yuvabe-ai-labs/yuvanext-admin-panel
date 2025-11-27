@@ -20,7 +20,6 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import UnitManagement from "@/components/UnitManagement";
 
 export default function CompanyManagement() {
