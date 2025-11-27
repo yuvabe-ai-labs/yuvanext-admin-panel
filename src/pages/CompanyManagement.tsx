@@ -7,11 +7,11 @@ import {
 } from "@/components/ui/custom-icons";
 import {
   useActiveInternships,
+  // useAllUnits,
   useProfileStats,
   useTotalApplications,
 } from "@/hooks/useProfile";
 import { Card } from "@/components/ui/card";
-import CompanyCard from "@/components/CompanyCard";
 import { useState } from "react";
 import { ChevronLeft, SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +20,8 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useInfiniteUnits } from "@/hooks/useInfiniteUnits";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import UnitManagement from "@/components/UnitManagement";
 
 export default function CompanyManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,8 +35,10 @@ export default function CompanyManagement() {
   const { data: profileStats } = useProfileStats();
   const { data: activeInternships } = useActiveInternships();
   const { data: totalApplications } = useTotalApplications();
-  // const { data: UnitApplicationCount } = useUnitApplicationCount();
   const navigate = useNavigate();
+
+  // const { data: unitsData, isLoading: unitsLoading } = useAllUnits(1, 10);
+  // const recentUnits = unitsData?.data || [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -148,34 +152,22 @@ export default function CompanyManagement() {
 
             {/* 🔥 Infinite Scroll */}
             <InfiniteScroll
+              style={{ overflow: "visible" }} // allow page scroll
               dataLength={companies.length}
               next={fetchNextPage}
               hasMore={hasNextPage ?? false}
               loader={<p className="py-4 text-center">Loading more...</p>}
               endMessage={
-                <p className="py-4 text-center text-gray-400">
-                  No more companies.
-                </p>
+                !(companies.length == 0) && (
+                  <p className="py-4 text-center text-gray-400">
+                    No more companies.
+                  </p>
+                )
               }
             >
-              {companies.map((company, index) => (
-                <CompanyCard
-                  key={index}
-                  name={company.unit_profile.unit_name || ""}
-                  email={company.unit_profile.contact_email || ""}
-                  logoUrl={company.unit_profile.avatar_url || ""}
-                  id={company.unit_profile.id}
-                  profileId={company.unit_profile.profile_id}
-                  applications={0}
-                  activePosts={0}
-                  joinDate={
-                    new Date(company.unit_profile.created_at)
-                      .toISOString()
-                      .split("T")[0]
-                  }
-                  status={"active"}
-                />
-              ))}
+              {/* Company Management */}
+
+              <UnitManagement units={companies} isLoading={!companies.length} />
             </InfiniteScroll>
           </div>
 

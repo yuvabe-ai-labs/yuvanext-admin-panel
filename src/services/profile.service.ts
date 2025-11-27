@@ -161,7 +161,8 @@ export const getAllUnits = async (
   // Count active internships per unit
   const activeInternshipsCountMap: Record<string, number> = {};
   internships?.forEach((i) => {
-    if (!activeInternshipsCountMap[i.created_by]) activeInternshipsCountMap[i.created_by] = 0;
+    if (!activeInternshipsCountMap[i.created_by])
+      activeInternshipsCountMap[i.created_by] = 0;
     if (i.status === "active") activeInternshipsCountMap[i.created_by] += 1;
   });
 
@@ -177,13 +178,16 @@ export const getAllUnits = async (
   applications?.forEach((app) => {
     const internship = internships?.find((i) => i.id === app.internship_id);
     if (!internship) return;
-    if (!applicationsCountMap[internship.created_by]) applicationsCountMap[internship.created_by] = 0;
+    if (!applicationsCountMap[internship.created_by])
+      applicationsCountMap[internship.created_by] = 0;
     applicationsCountMap[internship.created_by] += 1;
   });
 
   // Combine data
   const combined: UnitProfileData[] = profilesRes.data.map((profile) => {
-    const unitProfile = unitProfiles?.find((up) => up.profile_id === profile.id);
+    const unitProfile = unitProfiles?.find(
+      (up) => up.profile_id === profile.id
+    );
     return {
       profile,
       unit_profile: unitProfile as UnitProfile,
@@ -253,13 +257,17 @@ export const getActiveInternships = async () => {
 
   // 👉 2) Start of current month
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  ).toISOString();
 
   // 👉 3) Count active internships created this month
   const { count: internshipsThisMonth, error } = await supabase
     .from("internships")
     .select("*", { count: "exact", head: true })
-    .eq("status", "active")         // ✅ filter ACTIVE only
+    .eq("status", "active") // ✅ filter ACTIVE only
     .gte("created_at", startOfMonth);
 
   if (error) {
@@ -281,7 +289,11 @@ export const getActiveCourses = async () => {
 
   // 👉 2) Calculate start of current month
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  ).toISOString();
 
   // 👉 3) Count courses created this month
   const { count: coursesThisMonth, error } = await supabase
@@ -308,7 +320,11 @@ export const getHiredStats = async () => {
 
   // 👉 2) Start of current month
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  ).toISOString();
 
   // 👉 3) Hired this month
   const { count: hiredThisMonth, error } = await supabase
@@ -333,4 +349,45 @@ export const getTotalApplications = async () => {
     .from("applications")
     .select("*", { count: "exact", head: true });
   return { totalApplications: totalApplications ?? 0 };
+};
+
+// Total applications
+export const getTotalInternshipByUnit = async (unitId: string) => {
+  const { count: totalInternshipsByUnit } = await supabase
+    .from("internships")
+    .select("id", { count: "exact", head: true })
+    .match({
+      created_by: unitId,
+      status: "active",
+    });
+  return { totalInternshipsByUnit: totalInternshipsByUnit ?? 0 };
+};
+
+export const getAllCourse = async (
+  page: number = 1,
+  pageSize: number = 20,
+  searchTerm?: string
+) => {
+  let query = supabase
+    .from("courses")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false });
+
+  if (searchTerm) {
+    const s = searchTerm.trim().toLocaleLowerCase();
+    query = query.or(`full_name.ilike.%${s}%,email.ilike.%${s}%`);
+  }
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+
+  return {
+    data: data ?? [],
+    error,
+    count: count ?? 0,
+    totalPages: count ? Math.ceil(count / pageSize) : 0,
+  };
 };
