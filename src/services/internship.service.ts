@@ -110,7 +110,14 @@ export const getUnits = async (): Promise<{ data: Unit[]; error: any }> => {
     )
     .order("unit_name", { ascending: true });
 
-  return { data: data ?? [], error };
+  const normalized: Unit[] = (data ?? []).map((row: any) => ({
+    id: row.id,
+    profile_id: row.profile_id,
+    unit_name: row.unit_name ?? "",
+    contact_email: row.contact_email ?? "",
+  }));
+
+  return { data: normalized, error };
 };
 
 // Updated: use new type InternshipCreateInput here, keeps original Internship separate
