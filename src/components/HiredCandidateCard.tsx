@@ -1,5 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "./ui/button";
+import { MoveUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HiredCandidateCardProps {
   id: string;
@@ -13,6 +16,7 @@ interface HiredCandidateCardProps {
 }
 
 export default function HiredCandidateCard({
+  id,
   name,
   avatar_url,
   internship_title,
@@ -34,6 +38,12 @@ export default function HiredCandidateCard({
 
     return jobTypeMap[type] || type;
   };
+  const navigate = useNavigate();
+  const handleViewCandidate = (applicationId: string) => {
+    navigate(`/unit/candidate-tasks/${applicationId}`);
+  };
+  console.log("=============================");
+  console.log(id);
 
   return (
     <Card className="border border-gray-200 rounded-3xl hover:shadow-lg transition-shadow">
@@ -103,6 +113,16 @@ export default function HiredCandidateCard({
               {duration || "Duration not specified"} | {formatJobType(job_type)}
             </span>
           </div>
+        </div>
+        <div className="flex justify-end pt-2">
+          <Button
+            variant="outline"
+            className="rounded-full text-gray-600 cursor-pointer"
+            onClick={() => handleViewCandidate(id)}
+          >
+            View Tasks
+            <MoveUpRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
       </CardContent>
     </Card>
