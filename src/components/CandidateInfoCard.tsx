@@ -1,4 +1,4 @@
-import { Mail, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCandidateProfile } from "@/hooks/useCandidateProfile";
@@ -83,6 +83,12 @@ export default function CandidateInfoCard({
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4" />
                 <span>{profile.phone}</span>
+              </div>
+            )}
+            {internship.location && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                <span>{internship.location}</span>
               </div>
             )}
           </div>
