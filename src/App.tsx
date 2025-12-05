@@ -22,6 +22,7 @@ import Internships from "./pages/Internships";
 import InternshipDetailsPage from "@/pages/InternshipDetailsPage";
 import CandidateManagement from "./pages/CandidateManagement";
 import CandidateDetailPage from "@/pages/CandidateDetailPage";
+import UnitCandidateTasks from "./pages/UnitCandidateTasks";
 
 const queryClient = new QueryClient();
 
@@ -137,6 +138,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CandidateDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/candidate-tasks/:applicationId"
+              element={
+                <ProtectedRoute>
+                  <UnitCandidateTasks />
                 </ProtectedRoute>
               }
             />
