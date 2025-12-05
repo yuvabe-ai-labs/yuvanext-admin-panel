@@ -142,7 +142,7 @@ const App = () => (
               }
             />
             <Route
-              path="/unit/candidate-tasks/:applicationId"
+              path="/candidate-tasks/:applicationId"
               element={
                 <ProtectedRoute>
                   <UnitCandidateTasks />

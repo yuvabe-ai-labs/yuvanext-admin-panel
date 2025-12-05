@@ -40,10 +40,8 @@ export default function HiredCandidateCard({
   };
   const navigate = useNavigate();
   const handleViewCandidate = (applicationId: string) => {
-    navigate(`/unit/candidate-tasks/${applicationId}`);
+    navigate(`/candidate-tasks/${applicationId}`);
   };
-  console.log("=============================");
-  console.log(id);
 
   return (
     <Card className="border border-gray-200 rounded-3xl hover:shadow-lg transition-shadow">
