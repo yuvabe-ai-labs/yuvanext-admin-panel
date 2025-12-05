@@ -48,6 +48,7 @@ export type Database = {
           id: string;
           included_sections: Json | null;
           internship_id: string;
+          offer_decision: Database["public"]["Enums"]["offfer_decision"];
           profile_match_score: number | null;
           status: Database["public"]["Enums"]["application_status"];
           student_id: string;
@@ -59,6 +60,7 @@ export type Database = {
           id?: string;
           included_sections?: Json | null;
           internship_id: string;
+          offer_decision?: Database["public"]["Enums"]["offfer_decision"];
           profile_match_score?: number | null;
           status?: Database["public"]["Enums"]["application_status"];
           student_id: string;
@@ -70,6 +72,7 @@ export type Database = {
           id?: string;
           included_sections?: Json | null;
           internship_id?: string;
+          offer_decision?: Database["public"]["Enums"]["offfer_decision"];
           profile_match_score?: number | null;
           status?: Database["public"]["Enums"]["application_status"];
           student_id?: string;
@@ -463,88 +466,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      student_education: {
-        Row: {
-          created_at: string | null;
-          degree: string;
-          end_year: number | null;
-          id: string;
-          institution: string;
-          profile_id: string;
-          score: string | null;
-          start_year: number | null;
-        };
-        Insert: {
-          created_at?: string | null;
-          degree: string;
-          end_year?: number | null;
-          id?: string;
-          institution: string;
-          profile_id: string;
-          score?: string | null;
-          start_year?: number | null;
-        };
-        Update: {
-          created_at?: string | null;
-          degree?: string;
-          end_year?: number | null;
-          id?: string;
-          institution?: string;
-          profile_id?: string;
-          score?: string | null;
-          start_year?: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "student_education_profile_id_fkey";
-            columns: ["profile_id"];
-            isOneToOne: false;
-            referencedRelation: "student_profiles";
-            referencedColumns: ["profile_id"];
-          }
-        ];
-      };
-      student_internships: {
-        Row: {
-          company: string;
-          created_at: string | null;
-          description: string | null;
-          end_date: string | null;
-          id: string;
-          profile_id: string;
-          role: string;
-          start_date: string | null;
-        };
-        Insert: {
-          company: string;
-          created_at?: string | null;
-          description?: string | null;
-          end_date?: string | null;
-          id?: string;
-          profile_id: string;
-          role: string;
-          start_date?: string | null;
-        };
-        Update: {
-          company?: string;
-          created_at?: string | null;
-          description?: string | null;
-          end_date?: string | null;
-          id?: string;
-          profile_id?: string;
-          role?: string;
-          start_date?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "student_internships_profile_id_fkey";
-            columns: ["profile_id"];
-            isOneToOne: false;
-            referencedRelation: "student_profiles";
-            referencedColumns: ["profile_id"];
-          }
-        ];
-      };
       student_profiles: {
         Row: {
           achievements: Json | null;
@@ -660,44 +581,73 @@ export type Database = {
       };
       student_tasks: {
         Row: {
-          color: string;
-          created_at: string | null;
-          due_date: string;
+          application_id: string;
+          created_at: string;
+          description: string | null;
+          end_date: string | null;
           id: string;
-          note: string;
-          start_date: string;
-          student_id: string | null;
-          submission_link: string | null;
+          review_remarks: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          start_date: string | null;
+          status: Database["public"]["Enums"]["task_status"];
+          student_id: string;
+          submitted_at: string | null;
           title: string;
+          updated_at: string;
         };
         Insert: {
-          color: string;
-          created_at?: string | null;
-          due_date: string;
+          application_id: string;
+          created_at?: string;
+          description?: string | null;
+          end_date?: string | null;
           id?: string;
-          note: string;
-          start_date: string;
-          student_id?: string | null;
-          submission_link?: string | null;
+          review_remarks?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          start_date?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          student_id: string;
+          submitted_at?: string | null;
           title: string;
+          updated_at?: string;
         };
         Update: {
-          color?: string;
-          created_at?: string | null;
-          due_date?: string;
+          application_id?: string;
+          created_at?: string;
+          description?: string | null;
+          end_date?: string | null;
           id?: string;
-          note?: string;
-          start_date?: string;
-          student_id?: string | null;
-          submission_link?: string | null;
+          review_remarks?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          start_date?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          student_id?: string;
+          submitted_at?: string | null;
           title?: string;
+          updated_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "studen_tasks_student_id_fkey";
+            foreignKeyName: "student_tasks_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_tasks_reviewed_by_fkey";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_tasks_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
-            referencedRelation: "student_profiles";
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           }
         ];
@@ -794,30 +744,6 @@ export type Database = {
           }
         ];
       };
-      user_settings: {
-        Row: {
-          created_at: string | null;
-          id: string;
-          theme_preference: string | null;
-          updated_at: string | null;
-          user_id: string;
-        };
-        Insert: {
-          created_at?: string | null;
-          id?: string;
-          theme_preference?: string | null;
-          updated_at?: string | null;
-          user_id: string;
-        };
-        Update: {
-          created_at?: string | null;
-          id?: string;
-          theme_preference?: string | null;
-          updated_at?: string | null;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
     };
     Views: {
       [_ in never]: never;
@@ -852,6 +778,8 @@ export type Database = {
       enrollment_status: "enrolled" | "completed" | "dropped";
       internship_status: "active" | "closed" | "draft";
       job_type: "part_time" | "full_time" | "both";
+      offfer_decision: "pending" | "accepted" | "rejected";
+      task_status: "pending" | "submitted" | "redo" | "accepted";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -994,6 +922,8 @@ export const Constants = {
       enrollment_status: ["enrolled", "completed", "dropped"],
       internship_status: ["active", "closed", "draft"],
       job_type: ["part_time", "full_time", "both"],
+      offfer_decision: ["pending", "accepted", "rejected"],
+      task_status: ["pending", "submitted", "redo", "accepted"],
     },
   },
 } as const;

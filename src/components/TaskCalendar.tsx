@@ -17,7 +17,6 @@ interface TaskCalendarProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   viewMode: "month" | "week";
-  onTaskClick: (task: StudentTask) => void;
   onAddTaskClick: () => void;
   hideAddButton?: boolean;
 }
@@ -26,7 +25,6 @@ export default function TaskCalendar({
   tasks,
   currentDate,
   onDateChange,
-  onTaskClick,
   onAddTaskClick,
   hideAddButton = false,
 }: TaskCalendarProps) {
@@ -138,11 +136,7 @@ export default function TaskCalendar({
         }}
       >
         <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onTaskClick(task);
-          }}
-          className={`text-xs text-white py-2 cursor-pointer hover:opacity-90 transition-opacity ${borderRadius} min-h-7 flex items-center -mx-px absolute`}
+          className={`text-xs text-white py-2 hover:opacity-90 transition-opacity ${borderRadius} min-h-7 flex items-center -mx-px absolute`}
           style={{
             backgroundColor: task.color || "#3B82F6",
             left: `${leftOffset}%`,

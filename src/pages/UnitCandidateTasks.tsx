@@ -4,8 +4,6 @@ import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import { useStudentTasks } from "@/hooks/useStudentTasks";
 import TaskCalendar from "@/components/TaskCalendar";
-import ViewTaskModal from "@/components/ViewTaskModal";
-import type { StudentTask } from "@/types/studentTasks.types";
 import { Badge } from "@/components/ui/badge";
 import CandidateInfoCard from "@/components/CandidateInfoCard";
 import { ChevronLeft } from "lucide-react";
@@ -15,19 +13,10 @@ export default function UnitCandidateTasks() {
   const { applicationId } = useParams<{ applicationId: string }>();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode] = useState<"month" | "week">("month");
-  const [selectedTask, setSelectedTask] = useState<StudentTask | null>(null);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const { data: tasksResponse, isLoading: tasksLoading } =
     useStudentTasks(applicationId);
   const tasks = tasksResponse?.data || [];
-  const handleTaskClick = (task: StudentTask) => {
-    setSelectedTask(task);
-    setIsViewModalOpen(true);
-  };
-  const handleCloseModal = () => {
-    setIsViewModalOpen(false);
-    setSelectedTask(null);
-  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "accepted":
@@ -94,7 +83,6 @@ export default function UnitCandidateTasks() {
                 currentDate={currentDate}
                 onDateChange={setCurrentDate}
                 viewMode={viewMode}
-                onTaskClick={handleTaskClick}
                 onAddTaskClick={() => {}}
                 hideAddButton={true}
               />
@@ -116,8 +104,7 @@ export default function UnitCandidateTasks() {
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    onClick={() => handleTaskClick(task)}
-                    className="bg-white border border-gray-200 rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md"
+                    className="bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-md"
                   >
                     {/* Header */}
                     <div className="flex items-start gap-3 mb-2">
@@ -186,15 +173,6 @@ export default function UnitCandidateTasks() {
           </div>
         </div>
       </div>
-
-      {/* View Task Modal */}
-      {selectedTask && (
-        <ViewTaskModal
-          isOpen={isViewModalOpen}
-          onClose={handleCloseModal}
-          task={selectedTask}
-        />
-      )}
     </div>
   );
 }
