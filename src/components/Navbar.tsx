@@ -6,18 +6,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/useAuth";
+import { useSession, authClient } from "@/lib/auth-client";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "@/assets/YuvaNext.svg";
 
 const Navbar = () => {
-  const { user, admin, signOut } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
+    await authClient.signOut();
     navigate("/signin");
     setMobileMenuOpen(false);
   };
@@ -52,11 +53,11 @@ const Navbar = () => {
 
                     <Avatar className="h-10 w-10 border border-white shadow-md">
                       <AvatarImage
-                        src={undefined}
-                        alt={admin?.name || user?.email || "Admin"}
+                        src={user?.image || undefined}
+                        alt={user?.name || user?.email || "Admin"}
                       />
                       <AvatarFallback className="text-sm bg-[#F8F6F2] text-gray-800 font-semibold">
-                        {admin?.name?.charAt(0).toUpperCase() ||
+                        {user?.name?.charAt(0).toUpperCase() ||
                           user?.email?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -65,7 +66,7 @@ const Navbar = () => {
                 <DropdownMenuContent align="end" className="w-48 rounded-lg">
                   <div className="px-3 py-2 border-b">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {admin?.name || user?.email || "Admin"}
+                      {user?.name || user?.email || "Admin"}
                     </p>
                     <p className="text-xs text-gray-500">Administrator</p>
                   </div>
@@ -93,11 +94,11 @@ const Navbar = () => {
 
               <Avatar className="h-10 w-10 border border-white shadow-md">
                 <AvatarImage
-                  src={undefined}
-                  alt={admin?.name || user?.email || "Admin"}
+                  src={user?.image || undefined}
+                  alt={user?.name || user?.email || "Admin"}
                 />
                 <AvatarFallback className="text-sm bg-[#F8F6F2] text-gray-800 font-semibold">
-                  {admin?.name?.charAt(0).toUpperCase() ||
+                  {user?.name?.charAt(0).toUpperCase() ||
                     user?.email?.charAt(0).toUpperCase() ||
                     "A"}
                 </AvatarFallback>
@@ -121,18 +122,18 @@ const Navbar = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-12 w-12 border-2 border-gray-200">
                     <AvatarImage
-                      src={undefined}
-                      alt={admin?.name || user?.email || "Admin"}
+                      src={user?.image || undefined}
+                      alt={user?.name || user?.email || "Admin"}
                     />
                     <AvatarFallback className="text-sm bg-[#F8F6F2] text-gray-800 font-semibold">
-                      {admin?.name?.charAt(0).toUpperCase() ||
+                      {user?.name?.charAt(0).toUpperCase() ||
                         user?.email?.charAt(0).toUpperCase() ||
                         "A"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {admin?.name || user?.email || "Admin"}
+                      {user?.name || user?.email || "Admin"}
                     </p>
                     <p className="text-xs text-gray-500">Administrator</p>
                   </div>

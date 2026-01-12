@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useSession } from "@/lib/auth-client";
 import Navbar from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { useMemo } from "react";
@@ -22,7 +22,9 @@ import {
 import { format } from "date-fns";
 
 export default function Dashboard() {
-  const { user, admin } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const today = new Date();
   const formattedDate = format(today, "EEEE, dd MMMM yyyy");
 
@@ -65,26 +67,26 @@ export default function Dashboard() {
     [allStudentsData, allUnitsData]
   );
 
-  /** ⬇️ Supabase Candidate Profiles */
+  /**  Supabase Candidate Profiles */
   const candidateProfiles = candidateData?.data ?? [];
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      {/* <Navbar /> */}
 
       <div className="w-full mx-auto px-4 sm:px-12 lg:px-40 py-6 lg:py-10">
         {/* Header */}
         <div className="mb-8">
           <p className="text-lg text-muted-foreground">{formattedDate}</p>
           <h1 className="text-3xl font-bold">
-            Welcome back, {admin?.name || user?.email?.split("@")[0] || "Admin"}
+            Welcome back, {user?.name || user?.email?.split("@")[0] || "Admin"}
           </h1>
         </div>
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-4">
+          {/* <div className="lg:col-span-4">
             <Card className="border border-border rounded-3xl">
               <div className="p-6">
                 <StatsGrid
@@ -96,25 +98,25 @@ export default function Dashboard() {
                 <PerformanceChart data={performanceData} />
               </div>
             </Card>
-          </div>
+          </div> */}
 
           {/* RIGHT COLUMN */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <RecentCandidates
                 students={recentStudents}
                 isLoading={studentsLoading}
               />
               <RecentUnits units={recentUnits} isLoading={unitsLoading} />
-            </div>
+            </div> */}
 
             {/* Company Management */}
-            <CompanyManagement units={recentUnits} isLoading={unitsLoading} />
+            {/* <CompanyManagement units={recentUnits} isLoading={unitsLoading} /> */}
           </div>
         </div>
 
         {/* Candidate Management - now using real candidates */}
-        <CandidateManagement candidates={candidateProfiles} />
+        {/* <CandidateManagement candidates={candidateProfiles} /> */}
       </div>
     </div>
   );

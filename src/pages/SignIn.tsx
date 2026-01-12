@@ -1,23 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useAuth } from "@/hooks/useAuth";
+import { authClient } from "@/lib/auth-client";
 import { useToast } from "@/components/ui/use-toast";
 import { signInSchema } from "@/lib/schema";
 import signupIllustrate from "@/assets/signinillustion.png";
 import signinLogo from "@/assets/signinLogo.svg";
 import { Eye, EyeOff } from "lucide-react";
-import { signOutService } from "@/services/auth.service";
-import { Unauthorized } from "@/errors/AppError";
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
-
-  const { signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -35,46 +31,65 @@ const SignIn = () => {
   });
 
   const onSubmit = async (data: SignInFormData) => {
-    const result = await signIn(data.email, data.password);
+    try {
+      // Sign in with Better Auth
+      const { data: authData, error } = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+        rememberMe: data.keepLoggedIn,
+      });
 
-    if (result.error) {
-      // Detect unauthorized-admin response and sign out the user immediately
-      const isUnauthorizedAdmin =
-        (result.error instanceof Unauthorized &&
-          result.error.code === "UNAUTHORIZED_ADMIN") ||
-        result.error?.message?.toLowerCase().includes("not authorized");
+      if (error) {
+        // Handle authentication errors
+        let errorMessage = error.message || "Invalid email or password.";
+        let errorTitle = "Sign in failed";
 
-      if (isUnauthorizedAdmin) {
-        try {
-          await signOutService(); // sign out the session created by supabase
-        } catch {
-          // ignore sign-out errors, still proceed to inform the user
+        if (error.status === 401) {
+          errorMessage =
+            "Incorrect email or password. Please check your credentials.";
+        } else if (error.status === 403) {
+          errorMessage = "Please verify your email before signing in.";
+          errorTitle = "Verification Required";
+        } else if (error.status === 429) {
+          errorMessage = "Too many login attempts. Please try again later.";
         }
 
         toast({
+          title: errorTitle,
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if user has admin role
+      if (!authData?.user || authData.user.role !== "admin") {
+        // Sign out the user immediately if they're not an admin
+        await authClient.signOut();
+
+        toast({
           title: "Access Denied",
-          description: "You are not an admin user.",
+          description: "You are not authorized to access the admin panel.",
           variant: "destructive",
         });
         navigate("/unauthorized");
         return;
       }
 
-      // Other errors (invalid credentials, etc.)
+      // Successful admin login
       toast({
-        title: "Sign in failed",
-        description: result.error.message || "Invalid email or password.",
+        title: "Welcome!",
+        description: "Admin login successful.",
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Welcome!",
-      description: "Admin login successful.",
-    });
-
-    navigate("/dashboard");
   };
 
   return (
