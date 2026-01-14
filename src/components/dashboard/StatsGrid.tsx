@@ -7,12 +7,7 @@ import {
   Candidates,
 } from "@/components/ui/custom-icons";
 
-import {
-  useActiveInternships,
-  useActiveCourses,
-  useHiredStats,
-} from "@/hooks/useProfile";
-
+import { useAdminStatsOverview } from "@/hooks/useStats";
 import { useNavigate } from "react-router-dom";
 
 interface StatCardProps {
@@ -62,90 +57,63 @@ const StatCard = ({
   );
 };
 
-interface StatsGridProps {
-  totalUnits: number;
-  totalStudents: number;
-  newUnitsThisMonth: number;
-  newStudentsThisMonth: number;
-}
-
-export default function StatsGrid({
-  totalUnits,
-  totalStudents,
-  newUnitsThisMonth,
-  newStudentsThisMonth,
-}: StatsGridProps) {
+export default function StatsGrid() {
   const navigate = useNavigate();
-
-  const { data: activeInternshipsData, isLoading: isLoadingInternships } =
-    useActiveInternships();
-
-  const activePostsCount = activeInternshipsData?.totalInternships || 0;
-  const activePostsThisMonth = activeInternshipsData?.internshipsThisMonth || 0;
-
-  const { data: activeCoursesData, isLoading: isLoadingCourses } =
-    useActiveCourses();
-
-  const activeCoursesCount = activeCoursesData?.totalCourses || 0;
-  const activeCoursesThisMonth = activeCoursesData?.coursesThisMonth || 0;
-
-  const { data: hiredStatsData, isLoading: isLoadingHired } = useHiredStats();
-
-  const totalHiredCount = hiredStatsData?.totalHired || 0;
-  const hiredThisMonth = hiredStatsData?.hiredThisMonth || 0;
+  const { data: statsData, isLoading } = useAdminStatsOverview();
 
   const stats = [
     {
       icon: Companies,
       label: "Companies",
-      value: totalUnits,
-      subtext: `+${newUnitsThisMonth} new this month`,
+      value: statsData?.totalUnits || 0,
+      subtext: `+${statsData?.newUnitsThisMonth} new this month`,
       bgColor: "bg-blue-50",
-      isLoading: false,
+      isLoading,
       onClick: () => navigate("/company-management"),
     },
     {
       icon: Candidates,
       label: "Candidates",
-      value: totalStudents,
-      subtext: `+${newStudentsThisMonth} new this month`,
+      value: statsData?.totalCandidates || 0,
+      subtext: `+${statsData?.newCandidatesThisMonth} new this month`,
       bgColor: "bg-orange-50",
+      isLoading,
       onClick: () => navigate("/candidate-management"),
     },
     {
       icon: Posts,
       label: "Active Posts",
-      value: activePostsCount,
-      subtext: `+${activePostsThisMonth} new this month`,
+      value: statsData?.totalActiveInternships || 0,
+      subtext: `+${statsData?.newInternshipsThisMonth} new this month`,
       bgColor: "bg-yellow-50",
-      isLoading: isLoadingInternships,
+      isLoading,
       onClick: () => navigate("/internships"),
     },
     {
       icon: CoursesIcon,
       label: "Courses",
-      value: activeCoursesCount,
-      subtext: `+${activeCoursesThisMonth} new this month`,
+      value: statsData?.totalCourses || 0,
+      subtext: `+${statsData?.newCoursesThisMonth} new this month`,
       bgColor: "bg-indigo-50",
-      isLoading: isLoadingCourses,
+      isLoading,
       onClick: () => navigate("/courses"),
     },
     {
       icon: Hired,
       label: "Hired",
-      value: totalHiredCount,
-      subtext: `+${hiredThisMonth} new this month`,
+      value: statsData?.totalHiredCandidates || 0,
+      subtext: `+${statsData?.newHiresThisMonth} new this month`,
       bgColor: "bg-pink-50",
-      isLoading: isLoadingHired,
+      isLoading,
       onClick: () => navigate("/candidate-management"),
     },
     {
       icon: Platformhealth,
       label: "Platform Health",
-      value: "97%",
+      value: `${statsData?.healthPercentage || 0}%`,
       subtext: "Stable this month",
       bgColor: "bg-teal-50",
-      isLoading: false,
+      isLoading,
     },
   ];
 

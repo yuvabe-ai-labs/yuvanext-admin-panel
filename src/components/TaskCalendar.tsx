@@ -10,10 +10,25 @@ import {
   endOfWeek,
   startOfDay,
 } from "date-fns";
-import type { StudentTask } from "@/types/studentTasks.types";
+import type { TaskItem } from "@/types/candidateTasks.types";
+
+// Local interface for transformed task data used by calendar
+interface CalendarTask {
+  id: string;
+  title: string;
+  description: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  color: string;
+  status: string;
+  submission_link: string | null;
+  review_remarks: string | null;
+}
 
 interface TaskCalendarProps {
-  tasks: StudentTask[];
+  tasks: CalendarTask[];
   currentDate: Date;
   onDateChange: (date: Date) => void;
   viewMode: "month" | "week";
@@ -84,9 +99,9 @@ export default function TaskCalendar({
   };
 
   const renderTaskBar = (
-    task: StudentTask,
+    task: CalendarTask,
     day: Date,
-    dayTasks: StudentTask[]
+    dayTasks: CalendarTask[]
   ) => {
     if (!task.start_date || !task.end_date) return null;
 
@@ -222,7 +237,7 @@ export default function TaskCalendar({
                   className={`w-full flex items-center justify-center text-gray-300 font-semibold text-md mb-1`}
                 >
                   {isToday ? (
-                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full text-xs flex items-center justify-center mx-auto font-semibold text-md">
+                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full text-xs flex iftems-center justify-center mx-auto font-semibold text-md">
                       {format(day, "d")}
                     </div>
                   ) : (

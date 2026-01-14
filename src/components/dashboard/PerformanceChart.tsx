@@ -8,10 +8,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useMemo } from "react";
-import type { PerformanceData } from "@/types/profile.types";
+import type { PerformanceData } from "@/utils/dashboardUtils";
 
 interface PerformanceChartProps {
   data: PerformanceData[];
+  isLoading?: boolean;
 }
 
 interface CustomDotProps {
@@ -55,21 +56,48 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-md">
-        <p className="text-xs text-gray-600">{item.payload.month}</p>
+        <p className="text-xs text-gray-600 mb-1">{item.payload.month}</p>
         <p className="text-sm font-semibold text-gray-900">
-          {item.value} signups
+          {item.value} total signups
         </p>
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <p className="text-xs text-gray-600">
+            Candidates: {item.payload.candidates}
+          </p>
+          <p className="text-xs text-gray-600">Units: {item.payload.units}</p>
+        </div>
       </div>
     );
   }
   return null;
 };
 
-export default function PerformanceChart({ data }: PerformanceChartProps) {
+export default function PerformanceChart({
+  data,
+  isLoading,
+}: PerformanceChartProps) {
   const maxSignups = useMemo(
     () => Math.max(...data.map((d) => d.value), 1),
     [data]
   );
+
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-semibold">Performance</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              User signups over time
+            </p>
+          </div>
+        </div>
+        <div className="h-64 flex items-center justify-center">
+          <div className="text-sm text-muted-foreground">Loading chart...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

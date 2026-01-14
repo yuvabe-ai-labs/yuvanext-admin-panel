@@ -1,46 +1,52 @@
-interface Profile {
-  profile: {
-    created_at: string;
-  };
-}
+import { type SignupPerformanceData } from "@/types/stats.types";
+import { format, parseISO, startOfMonth, subMonths } from "date-fns";
 
-export function getNewProfilesThisMonth(profiles: Profile[]): number {
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  return profiles.filter(
-    (item) => new Date(item.profile.created_at) >= startOfMonth
-  ).length;
+export interface PerformanceData {
+  month: string;
+  value: number;
+  candidates: number;
+  units: number;
 }
 
 export function calculateMonthlySignups(
-  students: Profile[],
-  units: Profile[]
-): Array<{ month: string; value: number }> {
-  const allProfiles = [
-    ...students.map((s) => s.profile),
-    ...units.map((u) => u.profile),
-  ];
-
-  const monthsData = [];
+  signupData: SignupPerformanceData[],
+): PerformanceData[] {
+  // Get last 6 months including current month
+  const months: PerformanceData[] = [];
   const now = new Date();
 
   for (let i = 5; i >= 0; i--) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthName = monthDate.toLocaleDateString("en-US", { month: "short" });
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const monthDate = startOfMonth(subMonths(now, i));
+    const monthKey = format(monthDate, "MMM yyyy");
 
-    const signupsInMonth = allProfiles.filter((profile) => {
-      const createdAt = new Date(profile.created_at);
-      return createdAt >= monthDate && createdAt < nextMonth;
-    }).length;
-
-    monthsData.push({
-      month: monthName,
-      value: signupsInMonth,
+    months.push({
+      month: monthKey,
+      value: 0,
+      candidates: 0,
+      units: 0,
     });
   }
 
-  return monthsData;
+  // Count signups by month
+  signupData.forEach((item) => {
+    try {
+      const itemDate = parseISO(item.createdAt);
+      const monthKey = format(startOfMonth(itemDate), "MMM yyyy");
+
+      const monthData = months.find((m) => m.month === monthKey);
+
+      if (monthData) {
+        if (item.type === "candidate") {
+          monthData.candidates += 1;
+        } else if (item.type === "unit") {
+          monthData.units += 1;
+        }
+        monthData.value += 1;
+      }
+    } catch (error) {
+      console.error("Error parsing date:", item.createdAt, error);
+    }
+  });
+
+  return months;
 }

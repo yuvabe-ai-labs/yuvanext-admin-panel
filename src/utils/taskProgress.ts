@@ -1,11 +1,11 @@
-import type { StudentTask } from "@/types/studentTasks.types";
+import type { StudentTask } from "@/types/candidateTasks.types";
 
 export const calculateOverallTaskProgress = (tasks: StudentTask[]): number => {
   if (tasks.length === 0) return 0;
 
   const completedTasks = tasks.filter((task) => task.status === "accepted");
   const progressPercentage = Math.round(
-    (completedTasks.length / tasks.length) * 100
+    (completedTasks.length / tasks.length) * 100,
   );
 
   return progressPercentage;
@@ -17,11 +17,12 @@ export const getOverallTaskBreakdown = (tasks: StudentTask[]) => {
     (task) =>
       task.status === "pending" ||
       task.status === "submitted" ||
-      task.status === "redo"
+      task.status === "redo",
   );
 
-  const progressPercentage =
-    tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
+  const progressPercentage = tasks.length > 0
+    ? Math.round((completed.length / tasks.length) * 100)
+    : 0;
 
   return {
     total: tasks.length,

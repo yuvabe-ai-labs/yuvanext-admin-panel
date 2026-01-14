@@ -1,11 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { CandidateProfile, CandidateDetailedProfile, HiredCandidateProfile, SuspendCandidateInput } from "@/types/candidate.types";
+import type {
+  CandidateDetailedProfile,
+  CandidateProfile,
+  HiredCandidateProfile,
+  SuspendCandidateInput,
+} from "@/types/candidate.types";
 
 const ITEMS_PER_PAGE = 9;
 
 export const getAllCandidates = async (
   page: number = 1,
-  searchQuery: string = ""
+  searchQuery: string = "",
 ) => {
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
@@ -30,7 +35,7 @@ export const getAllCandidates = async (
         )
       )
     `,
-      { count: "exact" }
+      { count: "exact" },
     );
 
   // Add search filter if searchQuery is provided
@@ -47,21 +52,20 @@ export const getAllCandidates = async (
     return { data: [], totalCount: 0, totalPages: 0, error };
   }
 
-  const formatted: CandidateProfile[] =
-    data?.map((item) => {
-      const rawSkills = item.profile?.student_profile?.skills;
+  const formatted: CandidateProfile[] = data?.map((item) => {
+    const rawSkills = item.profile?.student_profile?.skills;
 
-      return {
-        id: item.id,
-        name: item.profile?.full_name ?? "",
-        internship_title: item.internship?.title ?? "",
-        company_name: item.internship?.company_name ?? "",
-        status: item.status,
-        bio: item.profile?.student_profile?.bio ?? null,
-        skills: Array.isArray(rawSkills) ? rawSkills : [],
-        avatar_url: item.profile?.student_profile?.avatar_url ?? null,
-      };
-    }) ?? [];
+    return {
+      id: item.id,
+      name: item.profile?.full_name ?? "",
+      internship_title: item.internship?.title ?? "",
+      company_name: item.internship?.company_name ?? "",
+      status: item.status,
+      bio: item.profile?.student_profile?.bio ?? null,
+      skills: Array.isArray(rawSkills) ? rawSkills : [],
+      avatar_url: item.profile?.student_profile?.avatar_url ?? null,
+    };
+  }) ?? [];
 
   return {
     data: formatted,
@@ -73,7 +77,7 @@ export const getAllCandidates = async (
 
 export const getHiredCandidates = async (
   page: number = 1,
-  searchQuery: string = ""
+  searchQuery: string = "",
 ) => {
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
@@ -104,7 +108,7 @@ export const getHiredCandidates = async (
         )
       )
     `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("status", "hired");
 
@@ -122,20 +126,19 @@ export const getHiredCandidates = async (
     return { data: [], totalCount: 0, totalPages: 0, error };
   }
 
-  const formatted: HiredCandidateProfile[] =
-    data?.map((item) => {
-      return {
-        id: item.id,
-        name: item.profile?.full_name ?? "",
-        avatar_url: item.profile?.student_profile?.avatar_url ?? null,
-        internship_title: item.internship?.title ?? "",
-        status: item.status,
-        job_type: item.internship?.job_type ?? null,
-        duration: item.internship?.duration ?? null,
-        unit_name: item.internship?.unit_profile?.unit?.unit_name ?? null,
-        unit_avatar_url: item.internship?.unit_profile?.unit?.avatar_url ?? null,
-      };
-    }) ?? [];
+  const formatted: HiredCandidateProfile[] = data?.map((item) => {
+    return {
+      id: item.id,
+      name: item.profile?.full_name ?? "",
+      avatar_url: item.profile?.student_profile?.avatar_url ?? null,
+      internship_title: item.internship?.title ?? "",
+      status: item.status,
+      job_type: item.internship?.job_type ?? null,
+      duration: item.internship?.duration ?? null,
+      unit_name: item.internship?.unit_profile?.unit?.unit_name ?? null,
+      unit_avatar_url: item.internship?.unit_profile?.unit?.avatar_url ?? null,
+    };
+  }) ?? [];
 
   return {
     data: formatted,
@@ -163,8 +166,10 @@ export const getCandidateStats = async () => {
 
   const totalCount = data?.length ?? 0;
   const hiredCount = data?.filter((app) => app.status === "hired").length ?? 0;
-  const interviewedCount = data?.filter((app) => app.status === "interviewed").length ?? 0;
-  const shortlistedCount = data?.filter((app) => app.status === "shortlisted").length ?? 0;
+  const interviewedCount =
+    data?.filter((app) => app.status === "interviewed").length ?? 0;
+  const shortlistedCount =
+    data?.filter((app) => app.status === "shortlisted").length ?? 0;
 
   return {
     totalCount,
@@ -200,7 +205,7 @@ export const getCandidateDetailedProfile = async (applicationId: string) => {
           completed_courses
         )
       )
-    `
+    `,
     )
     .eq("id", applicationId)
     .single();
@@ -237,7 +242,9 @@ export const getCandidateDetailedProfile = async (applicationId: string) => {
   return { data: formatted, error: null };
 };
 
-export const suspendCandidate = async ({ profileId }: SuspendCandidateInput) => {
+export const suspendCandidate = async (
+  { profileId }: SuspendCandidateInput,
+) => {
   const { data, error } = await supabase
     .from("profiles")
     .update({ is_suspended: true })
@@ -248,7 +255,9 @@ export const suspendCandidate = async ({ profileId }: SuspendCandidateInput) => 
   return { data, error };
 };
 
-export const retrieveCandidate = async ({ profileId }: SuspendCandidateInput) => {
+export const retrieveCandidate = async (
+  { profileId }: SuspendCandidateInput,
+) => {
   const { data, error } = await supabase
     .from("profiles")
     .update({ is_suspended: false })

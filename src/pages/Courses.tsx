@@ -1,124 +1,12 @@
-import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useCourses } from "@/hooks/useCourses";
-import { supabase } from "@/integrations/supabase/client";
-import { formatDistanceToNow } from "date-fns";
 
 const Courses = () => {
-  // const navigate = useNavigate();
-  const { courses: allCourses, loading: coursesLoading } = useCourses();
-  const [providers, setProviders] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
-
-  const [filters, setFilters] = useState({
-    providers: [] as string[],
-    titles: [] as string[],
-    difficulty: [] as string[],
-    postingDate: { from: "", to: "" },
-  });
-
-  const [, setActiveDateRange] = useState("");
-  const [showMobileFilters] = useState(false);
-
-  // Fetch course providers
-  useEffect(() => {
-    const fetchProviders = async () => {
-      const uniqueCreatorIds = [
-        ...new Set(allCourses.map((c) => c.created_by)),
-      ];
-
-      const { data } = await supabase
-        .from("units")
-        .select("id, unit_name")
-        .in("id", uniqueCreatorIds);
-
-      if (data) {
-        setProviders(data.map((p) => ({ id: p.id, name: p.unit_name ?? "" })));
-      }
-    };
-
-    if (allCourses.length > 0) {
-      fetchProviders();
-    }
-  }, [allCourses]);
-
-  useEffect(() => {
-    if (showMobileFilters) {
-      document.body.style.overflow = "hidden"; // ✅ stop background scroll
-    } else {
-      document.body.style.overflow = "auto"; // ✅ restore scrolling
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [showMobileFilters]);
-
-  const resetFilters = () => {
-    setFilters({
-      providers: [],
-      titles: [],
-      difficulty: [],
-      postingDate: { from: "", to: "" },
-    });
-    setActiveDateRange("");
-  };
-
-  const parsePgTimestamp = (ts: any): Date => {
-    if (ts instanceof Date) return ts;
-    if (!ts) return new Date(NaN);
-    let s = String(ts).trim();
-    s = s
-      .replace(" ", "T")
-      .replace(/\.(\d{3})\d+/, ".$1")
-      .replace(/\+00:00?$|Z$/i, "Z");
-    if (!/[zZ]|[+\-]\d{2}:?\d{2}$/.test(s)) s = s + "Z";
-    return new Date(s);
-  };
-
-  const filteredCourses = allCourses.filter((course) => {
-    // Filter by provider
-    if (filters.providers.length) {
-      const providerName = providers.find(
-        (p) => p.id === course.created_by
-      )?.name;
-      if (!providerName || !filters.providers.includes(providerName))
-        return false;
-    }
-
-    // Filter by title
-    if (filters.titles.length && !filters.titles.includes(course.title))
-      return false;
-
-    // Filter by difficulty
-    if (
-      filters.difficulty.length &&
-      !filters.difficulty.includes(course.difficulty_level || "")
-    )
-      return false;
-
-    // Filter by posting date
-    if (filters.postingDate.from || filters.postingDate.to) {
-      const courseDate = parsePgTimestamp(course.created_at).getTime();
-      const from = filters.postingDate.from
-        ? new Date(filters.postingDate.from).getTime()
-        : -Infinity;
-      const to = filters.postingDate.to
-        ? new Date(filters.postingDate.to).getTime()
-        : Infinity;
-      if (Number.isNaN(courseDate)) return false;
-      if (courseDate < from || courseDate > to) return false;
-    }
-
-    return true;
-  });
+  const { data: courses = [], isLoading } = useCourses();
 
   const getDifficultyColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -133,6 +21,30 @@ const Courses = () => {
     }
   };
 
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return `${interval} ${unit}${interval > 1 ? "s" : ""} ago`;
+      }
+    }
+
+    return "just now";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -142,7 +54,7 @@ const Courses = () => {
           <div className="flex-1 w-full">
             {/* Courses Grid */}
             <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredCourses.map((course) => {
+              {courses.map((course) => {
                 const gradients = [
                   "bg-gradient-to-br from-lime-400 to-green-600",
                   "bg-gradient-to-br from-purple-500 to-pink-600",
@@ -163,9 +75,9 @@ const Courses = () => {
                     <div
                       className={`h-40 ${gradient} relative flex items-center justify-center`}
                     >
-                      {course.image_url ? (
+                      {course.bannerUrl ? (
                         <img
-                          src={course.image_url}
+                          src={course.bannerUrl}
                           alt={course.title}
                           className="w-full h-full object-cover"
                         />
@@ -178,9 +90,7 @@ const Courses = () => {
                       )}
                       {/* Time ago badge */}
                       <Badge className="absolute top-3 right-3 bg-white/90 text-foreground hover:bg-white">
-                        {formatDistanceToNow(new Date(course.created_at), {
-                          addSuffix: true,
-                        })}
+                        {getTimeAgo(course.createdAt)}
                       </Badge>
                     </div>
 
@@ -191,13 +101,13 @@ const Courses = () => {
                           <Clock className="w-4 h-4" />
                           <span>{course.duration || "8 weeks"}</span>
                         </div>
-                        {course.difficulty_level && (
+                        {course.difficultyLevel && (
                           <Badge
                             className={`${getDifficultyColor(
-                              course.difficulty_level
+                              course.difficultyLevel
                             )} text-white`}
                           >
-                            {course.difficulty_level}
+                            {course.difficultyLevel}
                           </Badge>
                         )}
                       </div>
@@ -215,8 +125,9 @@ const Courses = () => {
 
                       {/* Know More Button */}
                       <a
-                        href={course.website_url || ""}
+                        href={course.redirectUrl || "#"}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="w-full inline-block text-center rounded-full border py-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all"
                       >
                         Know more
@@ -227,7 +138,7 @@ const Courses = () => {
               })}
 
               {/* Loading Skeletons */}
-              {coursesLoading &&
+              {isLoading &&
                 Array.from({ length: 6 }).map((_, i) => (
                   <Card
                     key={`skeleton-${i}`}
@@ -244,18 +155,11 @@ const Courses = () => {
                 ))}
             </div>
 
-            {!coursesLoading && filteredCourses.length === 0 && (
+            {!isLoading && courses.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">
-                  No courses found matching your filters.
+                  No courses available at the moment.
                 </p>
-                <Button
-                  variant="outline"
-                  onClick={resetFilters}
-                  className="mt-4"
-                >
-                  Clear Filters
-                </Button>
               </div>
             )}
           </div>

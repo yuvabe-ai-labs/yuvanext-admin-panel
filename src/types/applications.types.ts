@@ -1,20 +1,78 @@
+import type { JobType } from "./viewProfile.types";
 
-import type { StudentProfileData } from "@/types/profile.types";
+export type InternshipApplicationStatus =
+  | "applied"
+  | "shortlisted"
+  | "not_shortlisted"
+  | "interviewed"
+  | "hired";
 
-export interface Application {
-  id: string;
-  student_id: string;
-  internship_id: string;
-
-  cover_letter: string | null;
-  status: "applied" | "reviewed" | "accepted" | "rejected" | "withdrawn";
-  applied_date: string;
-  updated_at: string;
-
-  profile_match_score: number | null;
-  included_sections: string[];
+export interface PaginationMeta {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
 }
 
-export interface ApplicationWithStudent extends Application {
-  student: StudentProfileData;  
+// Standard parameter object for hooks and services
+export interface GetApplicationParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface AppliedCandidates {
+  candidateId: string;
+  avatarUrl: string | null;
+  name: string;
+  internshipName: string;
+  applicationStatus: InternshipApplicationStatus;
+  applicationId: string;
+  applicationCreatedAt: string;
+  skills: string[];
+  interests: string[];
+  profileSummary: string | null;
+}
+
+export interface AppliedCandidatesResponse {
+  data: AppliedCandidates[];
+  pagination: PaginationMeta;
+}
+
+export interface HiredCandidate {
+  candidateId: string;
+  avatarUrl: string | null;
+  name: string;
+  internshipName: string;
+  applicationStatus: InternshipApplicationStatus;
+  unitAvatarUrl: string | null;
+  unitName: string;
+  internshipDuration: string;
+  internshipJobType: JobType;
+  applicationId: string;
+  applicationCreatedAt: string;
+  hasTask: boolean;
+}
+
+export interface HiredCandidateResponse {
+  data: HiredCandidate[];
+  pagination: PaginationMeta;
+}
+
+export interface InterviewDetails {
+  candidateId: string;
+  name: string;
+  avatarUrl: string;
+  profileSummary: string;
+  internshipDuration: string;
+  internshipJobType: JobType;
+  unitId: string;
+  unitAvatarUrl: string;
+  applicationId: string;
+  interviewDate: string;
+}
+
+export interface InterviewScheduleResponse {
+  data: InterviewDetails[];
+  pagination: PaginationMeta;
 }
