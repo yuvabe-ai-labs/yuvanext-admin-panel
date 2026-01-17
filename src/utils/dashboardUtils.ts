@@ -11,42 +11,28 @@ export interface PerformanceData {
 export function calculateMonthlySignups(
   signupData: SignupPerformanceData[],
 ): PerformanceData[] {
-  // Get last 6 months including current month
-  const months: PerformanceData[] = [];
   const now = new Date();
 
-  for (let i = 5; i >= 0; i--) {
-    const monthDate = startOfMonth(subMonths(now, i));
-    const monthKey = format(monthDate, "MMM yyyy");
-
-    months.push({
-      month: monthKey,
-      value: 0,
-      candidates: 0,
-      units: 0,
-    });
-  }
-
-  // Count signups by month
-  signupData.forEach((item) => {
-    try {
-      const itemDate = parseISO(item.createdAt);
-      const monthKey = format(startOfMonth(itemDate), "MMM yyyy");
-
-      const monthData = months.find((m) => m.month === monthKey);
-
-      if (monthData) {
-        if (item.type === "candidate") {
-          monthData.candidates += 1;
-        } else if (item.type === "unit") {
-          monthData.units += 1;
-        }
-        monthData.value += 1;
-      }
-    } catch (error) {
-      console.error("Error parsing date:", item.createdAt, error);
-    }
+  const lastSixMonths = Array.from({ length: 6 }, (_, i) => {
+    const monthDate = startOfMonth(subMonths(now, 5 - i));
+    return format(monthDate, "MMM yyyy");
   });
 
-  return months;
+  return lastSixMonths.map((monthKey) => {
+    const monthlyItems = signupData.filter((item) => {
+      const itemDate = parseISO(item.createdAt);
+      return format(startOfMonth(itemDate), "MMM yyyy") === monthKey;
+    });
+    const candidates = monthlyItems.filter((i) =>
+      i.type === "candidate"
+    ).length;
+    const units = monthlyItems.filter((i) => i.type === "unit").length;
+
+    return {
+      month: monthKey,
+      value: monthlyItems.length,
+      candidates,
+      units,
+    };
+  });
 }

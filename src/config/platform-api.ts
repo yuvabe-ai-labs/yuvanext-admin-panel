@@ -1,7 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { authClient } from "@/lib/auth-client";
+import { env } from "@/env";
 
-const API_BASE_URL = `${import.meta.env.VITE_BETTER_AUTH_URL}/api`;
+const API_BASE_URL = `${env.VITE_BETTER_AUTH_URL}/api`;
 
 // Create Axios instance
 const axiosInstance = axios.create({
