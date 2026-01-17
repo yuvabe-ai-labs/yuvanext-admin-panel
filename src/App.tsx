@@ -23,6 +23,7 @@ import InternshipDetailsPage from "@/pages/InternshipDetailsPage";
 import CandidateManagement from "./pages/CandidateManagement";
 import CandidateDetailPage from "@/pages/CandidateDetailPage";
 import UnitCandidateTasks from "./pages/UnitCandidateTasks";
+import EnvironmentIndicator from "@/components/EnvironmentIndicator";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +43,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
-  // If logged in but not admin, redirect to unauthorized
   if (session.user.role !== "admin") {
     return <Navigate to="/unauthorized" replace />;
   }
@@ -50,7 +50,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// PUBLIC ROUTE (redirects to dashboard if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { data: session, isPending } = useSession();
 
@@ -74,6 +73,10 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+
+      {/* Visual differentiator for branches */}
+      <EnvironmentIndicator />
+
       <BrowserRouter>
         <Routes>
           <Route
@@ -157,7 +160,6 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-          {/* Default route */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
