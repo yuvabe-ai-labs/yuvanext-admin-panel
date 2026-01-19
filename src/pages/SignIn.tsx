@@ -6,6 +6,7 @@ import * as z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { useToast } from "@/components/ui/use-toast";
 import { signInSchema } from "@/lib/schema";
+import type { TypedSessionUser } from "@/hooks/useTypedSession";
 import signupIllustrate from "@/assets/signinillustion.png";
 import signinLogo from "@/assets/signinLogo.svg";
 import { Eye, EyeOff } from "lucide-react";
@@ -62,9 +63,10 @@ const SignIn = () => {
         return;
       }
 
-      // Check if user has admin role
-      if (!authData?.user || (authData.user as any).role !== "admin") {
-        // Sign out the user immediately if they're not an admin
+      if (
+        !authData?.user ||
+        (authData.user as TypedSessionUser).role !== "admin"
+      ) {
         await authClient.signOut();
 
         toast({

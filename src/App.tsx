@@ -10,7 +10,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { useSession } from "@/lib/auth-client";
+import { useTypedSession } from "./hooks/useTypedSession";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
@@ -28,7 +28,7 @@ import EnvironmentIndicator from "@/components/EnvironmentIndicator";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending } = useTypedSession();
   const location = useLocation();
 
   if (isPending) {
@@ -43,7 +43,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
-  if ((session.user as any).role !== "admin") {
+  if (session.user.role !== "admin") {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -51,7 +51,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending } = useTypedSession();
 
   if (isPending) {
     return (
@@ -61,7 +61,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (session?.user && (session.user as any).role === "admin") {
+  if (session?.user && session.user.role === "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
