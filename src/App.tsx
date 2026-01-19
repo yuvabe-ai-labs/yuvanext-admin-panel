@@ -10,7 +10,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { useTypedSession } from "./hooks/useTypedSession";
+import { useSession } from "@/lib/auth-client";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
@@ -28,7 +28,7 @@ import EnvironmentIndicator from "@/components/EnvironmentIndicator";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, isPending } = useTypedSession();
+  const { data: session, isPending } = useSession();
   const location = useLocation();
 
   if (isPending) {
@@ -51,7 +51,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, isPending } = useTypedSession();
+  const { data: session, isPending } = useSession();
 
   if (isPending) {
     return (

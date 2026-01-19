@@ -6,7 +6,6 @@ import * as z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { useToast } from "@/components/ui/use-toast";
 import { signInSchema } from "@/lib/schema";
-import type { TypedSessionUser } from "@/hooks/useTypedSession";
 import signupIllustrate from "@/assets/signinillustion.png";
 import signinLogo from "@/assets/signinLogo.svg";
 import { Eye, EyeOff } from "lucide-react";
@@ -62,11 +61,9 @@ const SignIn = () => {
         });
         return;
       }
+      const user = authData?.user as { role?: string };
 
-      if (
-        !authData?.user ||
-        (authData.user as TypedSessionUser).role !== "admin"
-      ) {
+      if (!user || user.role !== "admin") {
         await authClient.signOut();
 
         toast({
@@ -107,7 +104,7 @@ const SignIn = () => {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-6 px-8">
             <img src={signinLogo} alt="Sign in Logo" className="w-28 h-auto" />
-            <p className="text-white text-base font-medium max-w-xl leading-relaxed">
+            <p className="text-white text-base font-medium max-w-xl leading-relaxing">
               Welcome to the Admin Panel. Only verified admins can log in here.
             </p>
           </div>
