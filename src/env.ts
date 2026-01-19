@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   VITE_API_URL: z.string().url("Must be a valid URL"),
-  STAGE_TYPE: z.enum(["development", "staging", "production"]).default(
+  VITE_STAGE_TYPE: z.enum(["development", "staging", "production"]).default(
     "development",
   ),
 });

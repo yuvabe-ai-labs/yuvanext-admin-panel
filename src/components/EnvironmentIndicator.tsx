@@ -1,9 +1,9 @@
 import { env } from "@/env";
 
 const EnvironmentIndicator = () => {
-  if (env.STAGE_TYPE === "production") return null;
+  if (env.VITE_STAGE_TYPE === "production") return null;
 
-  const isStaging = env.STAGE_TYPE === "staging";
+  const isStaging = env.VITE_STAGE_TYPE === "staging";
 
   return (
     <div className="fixed bottom-0 left-0 w-32 h-32 overflow-hidden z-[9999] pointer-events-none select-none">
@@ -17,7 +17,7 @@ const EnvironmentIndicator = () => {
               : "bg-blue-600 text-white border-blue-700"
           }`}
       >
-        {env.STAGE_TYPE}
+        {env.VITE_STAGE_TYPE}
       </div>
     </div>
   );
