@@ -25,10 +25,11 @@ export default function HiredCandidateCard({
   unit_name,
   unit_avatar_url,
 }: HiredCandidateCardProps) {
+  const navigate = useNavigate();
+
   const formatJobType = (type: string | null | undefined) => {
     if (!type) return "Not specified";
 
-    // Convert job_type enum to readable format
     const jobTypeMap: { [key: string]: string } = {
       full_time: "Full time",
       part_time: "Part time",
@@ -38,8 +39,8 @@ export default function HiredCandidateCard({
 
     return jobTypeMap[type] || type;
   };
-  const navigate = useNavigate();
-  const handleViewCandidate = (applicationId: string) => {
+
+  const handleViewTasks = (applicationId: string) => {
     navigate(`/candidate-tasks/${applicationId}`);
   };
 
@@ -69,7 +70,7 @@ export default function HiredCandidateCard({
                   </AvatarFallback>
                 </Avatar>
 
-                {/* Unit Logo Badge - positioned bottom-right */}
+                {/* Unit Logo Badge */}
                 <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-white shadow-md overflow-hidden">
                   {unit_avatar_url ? (
                     <img
@@ -79,7 +80,7 @@ export default function HiredCandidateCard({
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
+                      <span className="text-white text-[10px] font-bold">
                         {unit_name
                           ?.split(" ")
                           .map((n) => n[0])
@@ -112,11 +113,12 @@ export default function HiredCandidateCard({
             </span>
           </div>
         </div>
+
         <div className="flex justify-end pt-2">
           <Button
             variant="outline"
             className="rounded-full text-gray-600 cursor-pointer"
-            onClick={() => handleViewCandidate(id)}
+            onClick={() => handleViewTasks(id)} // id is now applicationId
           >
             View Tasks
             <MoveUpRight className="w-4 h-4 ml-2" />

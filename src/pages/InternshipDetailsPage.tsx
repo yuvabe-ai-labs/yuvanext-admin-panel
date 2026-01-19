@@ -10,7 +10,7 @@ export default function InternshipDetailsPage() {
   const navigate = useNavigate();
   const { data: internshipData, isLoading } = useInternshipById(id || "");
 
-  const internship = internshipData?.data as InternshipDetailsView | undefined;
+  const internship = internshipData as InternshipDetailsView | undefined;
 
   const handleBack = () => {
     navigate(-1);
@@ -84,13 +84,13 @@ export default function InternshipDetailsPage() {
                   {internship.title}
                 </h1>
                 <p className="text-lg text-gray-700 mb-3 font-medium">
-                  {internship.company_name}
+                  {internship.createdBy.name}
                 </p>
                 <div className="flex flex-wrap items-center gap-5 text-sm text-gray-600">
-                  {internship.location && (
+                  {internship.createdBy.address && (
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-1.5 text-gray-500" />
-                      {internship.location}
+                      {internship.createdBy.address}
                     </div>
                   )}
                   <div className="flex items-center">
@@ -103,20 +103,20 @@ export default function InternshipDetailsPage() {
                       Paid - {internship.payment}
                     </div>
                   )}
-                  {internship.job_type && (
+                  {internship.jobType && (
                     <div className="flex items-center">
-                      {internship.job_type === "full_time"
+                      {internship.jobType === "full_time"
                         ? "Full Time"
-                        : internship.job_type === "part_time"
-                        ? "Part Time"
-                        : internship.job_type === "both"
-                        ? "Full Time & Part Time"
-                        : internship.job_type}
+                        : internship.jobType === "part_time"
+                          ? "Part Time"
+                          : internship.jobType === "both"
+                            ? "Full Time & Part Time"
+                            : internship.jobType}
                     </div>
                   )}
-                  {internship.min_age_required && (
+                  {internship.minAgeRequired && (
                     <div className="flex items-center">
-                      Minimum Age: {internship.min_age_required}
+                      Minimum Age: {internship.minAgeRequired}
                     </div>
                   )}
                 </div>
@@ -185,8 +185,8 @@ export default function InternshipDetailsPage() {
           )}
 
           {/* Skills Required */}
-          {internship.skills_required &&
-            internship.skills_required.length > 0 && (
+          {internship.skillsRequired &&
+            internship.skillsRequired.length > 0 && (
               <>
                 <div className="border-t border-gray-200 mb-8"></div>
                 <div className="mb-8">
@@ -194,7 +194,7 @@ export default function InternshipDetailsPage() {
                     Required Skills
                   </h2>
                   <div className="space-y-3">
-                    {internship.skills_required.map((skill, index) => (
+                    {internship.skillsRequired.map((skill, index) => (
                       <div key={index} className="flex items-start space-x-3">
                         <div className="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
                           <Check className="w-3 h-3" />
@@ -208,7 +208,7 @@ export default function InternshipDetailsPage() {
             )}
 
           {/* Additional Info */}
-          {internship.application_deadline && (
+          {internship.closingDate && (
             <>
               <div className="border-t border-gray-200 mb-8"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -217,13 +217,14 @@ export default function InternshipDetailsPage() {
                     Application Deadline
                   </h3>
                   <p className="text-gray-700">
-                    {new Date(
-                      internship.application_deadline
-                    ).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {new Date(internship.closingDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      }
+                    )}
                   </p>
                 </div>
               </div>

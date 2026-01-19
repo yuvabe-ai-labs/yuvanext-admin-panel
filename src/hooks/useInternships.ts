@@ -1,82 +1,47 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  getAllInternships, 
-  getActiveJobCount, 
-  getTotalApplications, 
-  suspendInternship,
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createInternship,
+  generateAIInternshipContent,
   getInternshipById,
-  getUnits,
-  createInternshipForUnit
+  getInternships,
 } from "@/services/internship.service";
-import { toast } from "sonner";
+import type {
+  AIGenerateRequest,
+  CreateInternshipPayload,
+  GetInternshipsParams,
+} from "@/types/internship.types";
 
-export const useInternships = (page: number = 1, searchQuery: string = "") => {
+export const useInternshipById = (id: string) => {
   return useQuery({
-    queryKey: ["internships", page, searchQuery],
-    queryFn: () => getAllInternships(page, searchQuery),
+    queryKey: ["internship-byid", id],
+    queryFn: () => getInternshipById(id),
+    enabled: !!id,
   });
 };
 
-export const useActiveJobCount = () => {
+export const useInternships = (params: GetInternshipsParams = {}) => {
   return useQuery({
-    queryKey: ["activeJobCount"],
-    queryFn: getActiveJobCount,
+    queryKey: ["internships", params],
+    queryFn: () => getInternships(params),
+    placeholderData: (previousData) => previousData,
   });
 };
 
-export const useTotalApplications = () => {
-  return useQuery({
-    queryKey: ["totalApplications"],
-    queryFn: getTotalApplications,
-  });
-};
-
-export const useSuspendInternship = () => {
+export const useCreateInternship = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (internshipId: string) => suspendInternship(internshipId),
+    mutationFn: (payload: CreateInternshipPayload) => createInternship(payload),
+
     onSuccess: () => {
-      // Invalidate and refetch relevant queries
       queryClient.invalidateQueries({ queryKey: ["internships"] });
-      queryClient.invalidateQueries({ queryKey: ["activeJobCount"] });
-      
-      // Show success notification
-      toast.success("Internship suspended successfully");
-    },
-    onError: (error: Error) => {
-      // Show error notification
-      toast.error(`Failed to suspend internship: ${error.message}`);
     },
   });
 };
 
-export const useInternshipById = (internshipId: string) => {
-  return useQuery({
-    queryKey: ["internship", internshipId],
-    queryFn: () => getInternshipById(internshipId),
-    enabled: !!internshipId,
-  });
-};
-
-export const useUnits = () => {
-  return useQuery({
-    queryKey: ["units"],
-    queryFn: getUnits,
-  });
-};
-
-export const useCreateInternshipForUnit = () => {
-  const queryClient = useQueryClient();
-
+export const useGenerateAIContent = () => {
   return useMutation({
-    mutationFn: createInternshipForUnit,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["internships"] });
-      toast.success("Internship created successfully");
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to create internship: ${error.message}`);
-    },
+    mutationFn: (payload: AIGenerateRequest) =>
+      generateAIInternshipContent(payload),
   });
 };
