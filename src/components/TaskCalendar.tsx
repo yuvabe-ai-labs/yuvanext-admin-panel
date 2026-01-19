@@ -10,7 +10,6 @@ import {
   endOfWeek,
   startOfDay,
 } from "date-fns";
-import type { TaskItem } from "@/types/candidateTasks.types";
 
 // Local interface for transformed task data used by calendar
 interface CalendarTask {
@@ -101,7 +100,7 @@ export default function TaskCalendar({
   const renderTaskBar = (
     task: CalendarTask,
     day: Date,
-    dayTasks: CalendarTask[]
+    dayTasks: CalendarTask[],
   ) => {
     if (!task.start_date || !task.end_date) return null;
 

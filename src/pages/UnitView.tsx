@@ -93,8 +93,8 @@ const UnitView = () => {
   }
 
   const internships = unit.internships || [];
-  // Determine if unit is active (you may need to adjust this based on your actual data structure)
-  const isActive = unit.status === "active" || internships.length > 0;
+  // Use userAccountStatus boolean to determine if unit is active
+  const isActive = unit.userAccountStatus ?? true;
 
   return (
     <div className="min-h-screen bg-background">
@@ -208,7 +208,7 @@ const UnitView = () => {
                                 </a>
                               </button>
                             );
-                          }
+                          },
                         )}
                       </div>
                     )}

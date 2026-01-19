@@ -41,6 +41,7 @@ export interface UnitDetail {
     location: string | null;
     opportunitiesOffered: any[];
     projects: any[];
+    userAccountStatus: boolean;
     socialLinks: Record<string, string> | null;
     email: string | null;
     internships: InternshipItem[];
@@ -89,7 +90,7 @@ export interface CandidateProfile {
     gender: Gender | null;
     dateOfBirth: string | null;
     onboardingCompleted: boolean;
-
+    userAccountStatus: boolean;
     education: unknown[];
     language: LanguageSkill[];
     course: unknown[];

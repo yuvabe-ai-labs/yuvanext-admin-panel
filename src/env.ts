@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  VITE_BETTER_AUTH_URL: z.string().url("Must be a valid URL"),
-  VITE_APP_BATCH: z.enum(["development", "staging", "production"]).default(
+  VITE_API_URL: z.string().url("Must be a valid URL"),
+  STAGE_TYPE: z.enum(["development", "staging", "production"]).default(
     "development",
   ),
 });

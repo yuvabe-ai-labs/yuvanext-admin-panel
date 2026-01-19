@@ -1,8 +1,7 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
-import { calculateOverallTaskProgress } from "@/utils/taskProgress";
 
 interface CandidateInfoCardProps {
   applicationId: string | undefined;
@@ -16,8 +15,6 @@ export default function CandidateInfoCard({
 
   // FIXED: Access directly since the API returns a single object (data), not an array
   const applicationDetails = applicationData;
-  const tasks = applicationDetails?.tasks || [];
-  const taskProgress = calculateOverallTaskProgress(tasks);
 
   if (isLoading) {
     return (
@@ -114,19 +111,10 @@ export default function CandidateInfoCard({
                 strokeWidth="10"
                 fill="none"
                 strokeDasharray={2 * Math.PI * 48}
-                strokeDashoffset={2 * Math.PI * 48 * (1 - taskProgress / 100)}
                 strokeLinecap="round"
                 className="transition-all duration-700 ease-out"
               />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center leading-tight">
-              <span className="text-base font-semibold text-gray-500">
-                {taskProgress}%
-              </span>
-              <span className="text-[9px] font-medium text-gray-500 mt-0.5">
-                Projects Progress
-              </span>
-            </div>
           </div>
         </div>
       </div>

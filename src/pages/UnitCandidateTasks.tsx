@@ -20,7 +20,6 @@ export default function UnitCandidateTasks() {
 
   // FIXED: Access directly instead of using [0]
   const tasks = applicationData?.tasks || [];
-  const applicationInfo = applicationData;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -148,7 +147,7 @@ export default function UnitCandidateTasks() {
                             <Badge
                               variant="secondary"
                               className={`${getStatusColor(
-                                task.taskStatus
+                                task.taskStatus,
                               )} text-white text-[10px] px-2 py-0.5`}
                             >
                               {getStatusLabel(task.taskStatus)}
