@@ -43,7 +43,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
-  if (session.user.role !== "admin") {
+  if ((session.user as any).role !== "admin") {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -61,7 +61,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (session?.user && session.user.role === "admin") {
+  if (session?.user && (session.user as any).role === "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 

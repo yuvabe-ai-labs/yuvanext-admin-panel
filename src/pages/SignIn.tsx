@@ -63,7 +63,7 @@ const SignIn = () => {
       }
 
       // Check if user has admin role
-      if (!authData?.user || authData.user.role !== "admin") {
+      if (!authData?.user || (authData.user as any).role !== "admin") {
         // Sign out the user immediately if they're not an admin
         await authClient.signOut();
 
