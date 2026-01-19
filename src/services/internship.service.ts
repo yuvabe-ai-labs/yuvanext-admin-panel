@@ -1,173 +1,81 @@
-// internship.service.ts
-import { supabase } from "@/integrations/supabase/client";
+import axiosInstance from "@/config/platform-api";
 import type {
-  InternshipWithCount,
-  Unit,
-  InternshipCreateInput,
+  AIGenerateRequest,
+  AIGenerateResponse,
+  CreateInternshipPayload,
+  GetInternshipsParams,
+  Internship,
+  InternshipDetailsView,
+  PaginatedInternshipData,
 } from "@/types/internship.types";
+import { handleApiError, handleApiResponse } from "@/lib/api-handler";
 
-const ITEMS_PER_PAGE = 9;
-
-export const getAllInternships = async (
-  page: number = 1,
-  searchQuery: string = ""
-) => {
-  const from = (page - 1) * ITEMS_PER_PAGE;
-  const to = from + ITEMS_PER_PAGE - 1;
-
-  let query = supabase
-    .from("internships")
-    .select(
-      `
-      *,
-      applications:applications(count)
-    `,
-      { count: "exact" }
-    )
-    .eq("status", "active");
-
-  if (searchQuery) {
-    query = query.ilike("title", `%${searchQuery}%`);
+export const getInternshipById = async (
+  id: string,
+): Promise<InternshipDetailsView> => {
+  try {
+    const response = await axiosInstance.get(`/internships/${id}`);
+    return handleApiResponse<InternshipDetailsView>(
+      response,
+      {} as InternshipDetailsView,
+    );
+  } catch (error) {
+    return handleApiError(error, `Failed to fetch internship ${id}`);
   }
-
-  const { data, error, count } = await query
-    .order("created_at", { ascending: false })
-    .range(from, to);
-
-  const formatted = data?.map((item) => ({
-    ...item,
-    application_count: item.applications?.[0]?.count ?? 0,
-  }));
-
-  return {
-    data: (formatted as InternshipWithCount[]) ?? [],
-    totalCount: count ?? 0,
-    totalPages: Math.ceil((count ?? 0) / ITEMS_PER_PAGE),
-    error,
-  };
 };
 
-export const getActiveJobCount = async () => {
-  const { count, error } = await supabase
-    .from("internships")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "active");
+export const getInternships = async (
+  params: GetInternshipsParams = {},
+): Promise<PaginatedInternshipData> => {
+  try {
+    const response = await axiosInstance.get("/admin/internships", {
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        status: params.status,
+      },
+    });
 
-  return {
-    activeJobs: count ?? 0,
-    error,
-  };
+    // Use standard handler for the internship array
+    const internships = handleApiResponse<Internship[]>(response, []);
+
+    // Return both the data and the pagination sibling from the response
+    return {
+      internships,
+      pagination: response.data.pagination,
+    };
+  } catch (error) {
+    return handleApiError(error, "Failed to fetch internships");
+  }
 };
 
-export const getTotalApplications = async () => {
-  const { count, error } = await supabase
-    .from("applications")
-    .select("*", { count: "exact", head: true });
-
-  return {
-    totalApplications: count ?? 0,
-    error,
-  };
+export const createInternship = async (
+  payload: CreateInternshipPayload,
+): Promise<InternshipDetailsView> => {
+  try {
+    const response = await axiosInstance.post("/internships", payload);
+    return handleApiResponse<InternshipDetailsView>(
+      response,
+      {} as InternshipDetailsView,
+    );
+  } catch (error) {
+    return handleApiError(error, "Failed to create internship");
+  }
 };
 
-export const suspendInternship = async (internshipId: string) => {
-  const { data, error } = await supabase
-    .from("internships")
-    .update({ status: "closed" })
-    .eq("id", internshipId)
-    .select()
-    .single();
-
-  return {
-    data,
-    error,
-  };
-};
-
-export const getInternshipById = async (internshipId: string) => {
-  const { data, error } = await supabase
-    .from("internships")
-    .select("*")
-    .eq("id", internshipId)
-    .single();
-
-  return {
-    data,
-    error,
-  };
-};
-
-export const getUnits = async (): Promise<{ data: Unit[]; error: any }> => {
-  const { data, error } = await supabase
-    .from("units")
-    .select(
-      `
-      id,
-      profile_id,
-      unit_name,
-      contact_email
-    `
-    )
-    .order("unit_name", { ascending: true });
-
-  const normalized: Unit[] = (data ?? []).map((row: any) => ({
-    id: row.id,
-    profile_id: row.profile_id,
-    unit_name: row.unit_name ?? "",
-    contact_email: row.contact_email ?? "",
-  }));
-
-  return { data: normalized, error };
-};
-
-// Updated: use new type InternshipCreateInput here, keeps original Internship separate
-export const createInternshipForUnit = async (
-  internship: InternshipCreateInput
-) => {
-  const { data, error } = await supabase
-    .from("internships")
-    .insert({
-      title: internship.title,
-      company_name: internship.company_name,
-      duration: internship.duration,
-      payment: internship.payment ?? null,
-      job_type: internship.job_type ?? null,
-      min_age_required: internship.min_age_required ?? null,
-      description: internship.description,
-      responsibilities: internship.responsibilities ?? [],
-      benefits: internship.benefits ?? [],
-      skills_required: internship.skills_required ?? [],
-      application_deadline: internship.application_deadline ?? null,
-      created_by: internship.created_by,
-      status: internship.status ?? "draft",
-      posted_date: new Date().toISOString(),
-    })
-    .select()
-    .single();
-
-  return { data, error };
-};
-
-export const getUnitApplicationCount = async (unitProfileId: string) => {
-  const { data, error } = await supabase
-    .from("internships")
-    .select(
-      `
-      id,
-      applications(count)
-    `
-    )
-    .eq("created_by", unitProfileId); // the unit's profile id
-
-  if (error) return { error, totalApplications: 0 };
-
-  // Sum all application counts
-  const totalApplications = data.reduce((sum, internship) => {
-    return sum + (internship.applications?.[0]?.count ?? 0);
-  }, 0);
-
-  return {
-    totalApplications,
-    error: null,
-  };
+export const generateAIInternshipContent = async (
+  payload: AIGenerateRequest,
+): Promise<AIGenerateResponse> => {
+  try {
+    const response = await axiosInstance.post(
+      "/unit/ai/generate-content",
+      payload,
+    );
+    return handleApiResponse<AIGenerateResponse>(
+      response,
+      {} as AIGenerateResponse,
+    );
+  } catch (error) {
+    return handleApiError(error, "Failed to generate AI content");
+  }
 };

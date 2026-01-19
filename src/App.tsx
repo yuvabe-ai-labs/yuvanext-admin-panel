@@ -10,7 +10,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { useSession } from "@/lib/auth-client";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
@@ -23,14 +23,15 @@ import InternshipDetailsPage from "@/pages/InternshipDetailsPage";
 import CandidateManagement from "./pages/CandidateManagement";
 import CandidateDetailPage from "@/pages/CandidateDetailPage";
 import UnitCandidateTasks from "./pages/UnitCandidateTasks";
+import EnvironmentIndicator from "@/components/EnvironmentIndicator";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading, isAdmin } = useAuth();
+  const { data: session, isPending } = useSession();
   const location = useLocation();
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="animate-spin h-12 w-12 rounded-full border-b-2 border-primary"></div>
@@ -38,23 +39,21 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user) {
+  if (!session?.user) {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
-  // If logged in but not admin, redirect to unauthorized
-  if (!isAdmin) {
+  if (session.user.role !== "admin") {
     return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;
 };
 
-//  PUBLIC ROUTE (redirects to dashboard if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdmin, loading } = useAuth();
+  const { data: session, isPending } = useSession();
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="animate-spin h-12 w-12 rounded-full border-b-2 border-primary"></div>
@@ -62,114 +61,108 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (user && isAdmin) {
+  if (session?.user && session.user.role === "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
 };
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
+
+      {/* Visual differentiator for branches */}
+      <EnvironmentIndicator />
+
       <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route
-              path="/signin"
-              element={
-                <PublicRoute>
-                  <SignIn />
-                </PublicRoute>
-              }
-            />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/company-management"
-              element={
-                <ProtectedRoute>
-                  <CompanyManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/internships"
-              element={
-                <ProtectedRoute>
-                  <Internships />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/internships"
-              element={
-                <ProtectedRoute>
-                  <Internships />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/internships/:id"
-              element={
-                <ProtectedRoute>
-                  <InternshipDetailsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/candidate-management"
-              element={
-                <ProtectedRoute>
-                  <CandidateManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/candidate/:applicationId"
-              element={
-                <ProtectedRoute>
-                  <CandidateDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/candidate-tasks/:applicationId"
-              element={
-                <ProtectedRoute>
-                  <UnitCandidateTasks />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/units/:id"
-              element={
-                <ProtectedRoute>
-                  <UnitView />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/courses"
-              element={
-                <ProtectedRoute>
-                  <Courses />
-                </ProtectedRoute>
-              }
-            />
-            ;{/* Default route */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </AuthProvider>
+        <Routes>
+          <Route
+            path="/signin"
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            }
+          />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/company-management"
+            element={
+              <ProtectedRoute>
+                <CompanyManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/internships"
+            element={
+              <ProtectedRoute>
+                <Internships />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/internships/:id"
+            element={
+              <ProtectedRoute>
+                <InternshipDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/candidate-management"
+            element={
+              <ProtectedRoute>
+                <CandidateManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/candidate/:applicationId"
+            element={
+              <ProtectedRoute>
+                <CandidateDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/candidate-tasks/:applicationId"
+            element={
+              <ProtectedRoute>
+                <UnitCandidateTasks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/units/:id"
+            element={
+              <ProtectedRoute>
+                <UnitView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

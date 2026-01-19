@@ -2,20 +2,24 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
-import { useStudentTasks } from "@/hooks/useStudentTasks";
+import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
 import TaskCalendar from "@/components/TaskCalendar";
 import { Badge } from "@/components/ui/badge";
 import CandidateInfoCard from "@/components/CandidateInfoCard";
 import { ChevronLeft } from "lucide-react";
+import type { TaskItem } from "@/types/candidateTasks.types";
 
 export default function UnitCandidateTasks() {
   const navigate = useNavigate();
   const { applicationId } = useParams<{ applicationId: string }>();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode] = useState<"month" | "week">("month");
-  const { data: tasksResponse, isLoading: tasksLoading } =
-    useStudentTasks(applicationId);
-  const tasks = tasksResponse?.data || [];
+
+  const { data: applicationData, isLoading: tasksLoading } =
+    useTasksByApplicationId(applicationId);
+
+  // FIXED: Access directly instead of using [0]
+  const tasks = applicationData?.tasks || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -29,6 +33,7 @@ export default function UnitCandidateTasks() {
         return "bg-gray-500";
     }
   };
+
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "accepted":
@@ -41,6 +46,21 @@ export default function UnitCandidateTasks() {
         return "Pending";
     }
   };
+
+  // Transform TaskItem to match TaskCalendar expectations
+  const transformedTasks = tasks.map((task: TaskItem) => ({
+    id: task.taskId,
+    title: task.taskTitle,
+    description: task.taskDescription,
+    start_date: task.taskStartDate,
+    end_date: task.taskEndDate,
+    start_time: task.taskStartTime,
+    end_time: task.taskEndTime,
+    color: task.taskColor || "#3B82F6",
+    status: task.taskStatus,
+    submission_link: task.taskSubmissionLink,
+    review_remarks: task.taskReviewRemarks,
+  }));
 
   if (!applicationId) {
     return (
@@ -81,7 +101,7 @@ export default function UnitCandidateTasks() {
                 </div>
               ) : (
                 <TaskCalendar
-                  tasks={tasks}
+                  tasks={transformedTasks}
                   currentDate={currentDate}
                   onDateChange={setCurrentDate}
                   viewMode={viewMode}
@@ -105,63 +125,65 @@ export default function UnitCandidateTasks() {
                 </div>
               ) : (
                 <div className="space-y-3  grow pr-2">
-                  {tasks.map((task) => (
+                  {tasks.map((task: TaskItem) => (
                     <div
-                      key={task.id}
+                      key={task.taskId}
                       className="bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-md"
                     >
                       {/* Header */}
                       <div className="flex items-start gap-3 mb-2">
                         <div
                           className="w-4 h-1 rounded-full mt-1.5 shrink-0"
-                          style={{ backgroundColor: task.color }}
+                          style={{
+                            backgroundColor: task.taskColor || "#3B82F6",
+                          }}
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="font-semibold text-gray-900 text-sm mb-1">
-                              {task.title}
+                              {task.taskTitle}
                             </h3>
 
                             <Badge
                               variant="secondary"
                               className={`${getStatusColor(
-                                task.status
+                                task.taskStatus,
                               )} text-white text-[10px] px-2 py-0.5`}
                             >
-                              {getStatusLabel(task.status)}
+                              {getStatusLabel(task.taskStatus)}
                             </Badge>
                           </div>
 
-                          {task.end_date && (
+                          {task.taskEndDate && (
                             <p className="text-xs text-gray-500 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full border-2 border-orange-400"></span>
                               Due on{" "}
-                              {format(new Date(task.end_date), "do MMMM")}
+                              {format(new Date(task.taskEndDate), "do MMMM")}
                             </p>
                           )}
                         </div>
                       </div>
 
                       {/* Description */}
-                      {task.description && (
+                      {task.taskDescription && (
                         <p className="text-xs text-gray-600 mb-3 leading-relaxed pl-7">
-                          {task.description}
+                          {task.taskDescription}
                         </p>
                       )}
 
-                      {task.review_remarks && (
+                      {task.taskReviewRemarks && (
                         <div className="pl-7 mb-3">
                           <p className="text-[11px] font-medium text-gray-700 mb-1">
                             Remarks
                           </p>
                           <p className="text-xs text-gray-600 leading-relaxed">
-                            {task.review_remarks}
+                            {task.taskReviewRemarks}
                           </p>
                         </div>
                       )}
 
                       {/* Submission Link indicator */}
-                      {task.submission_link && (
+                      {task.taskSubmissionLink && (
                         <div className="pl-7">
                           <Badge
                             variant="outline"

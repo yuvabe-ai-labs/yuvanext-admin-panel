@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useSession, signOut } from "@/lib/auth-client";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ShieldX } from "lucide-react";
@@ -9,11 +9,13 @@ import signinLogo from "@/assets/signinLogo.svg";
 
 export default function Unauthorized() {
   const navigate = useNavigate();
-  const { signOut, user } = useAuth();
+  const { data: session } = useSession();
 
   useEffect(() => {
-    if (user) signOut();
-  }, [user, signOut]);
+    if (session) {
+      signOut();
+    }
+  }, [session]);
 
   return (
     <div className="min-h-screen bg-white flex">

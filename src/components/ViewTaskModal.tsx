@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { X, Calendar } from "lucide-react";
+import { X, Calendar, Link as LinkIcon } from "lucide-react";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -7,16 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useUpdateStudentTask } from "@/hooks/useStudentTasks";
-import type { StudentTask } from "@/types/studentTasks.types";
-import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import type { TaskItem } from "@/types/candidateTasks.types";
 
 interface ViewTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  task: StudentTask;
+  task: TaskItem; // Updated to use TaskItem to match your existing types
 }
 
 export default function ViewTaskModal({
@@ -24,82 +20,47 @@ export default function ViewTaskModal({
   onClose,
   task,
 }: ViewTaskModalProps) {
-  const [remarks, setRemarks] = useState(task.review_remarks || "");
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const updateTaskMutation = useUpdateStudentTask();
-
-  // Send (Redo) - Update remarks and set status to redo
-  const handleSend = async () => {
-    if (!remarks.trim()) {
-      toast.error("Please add remarks before sending");
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const result = await updateTaskMutation.mutateAsync({
-        taskId: task.id,
-        updates: {
-          status: "redo",
-          review_remarks: remarks.trim(),
-        },
-      });
-
-      if (result.success) {
-        toast.success("Task sent back for redo");
-        onClose();
-      } else {
-        toast.error("Failed to update task");
-      }
-    } catch (error) {
-      console.error("Error updating task:", error);
-      toast.error("An error occurred while updating the task");
-    } finally {
-      setIsUpdating(false);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-500";
+      case "redo":
+        return "bg-orange-500";
+      case "submitted":
+        return "bg-blue-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
-  // Close Task (Accept) - Set status to accepted
-  const handleCloseTask = async () => {
-    setIsUpdating(true);
-    try {
-      const updateData: any = {
-        status: "accepted",
-      };
-
-      // If there are remarks, save them too
-      if (remarks.trim() && remarks !== task.review_remarks) {
-        updateData.review_remarks = remarks.trim();
-      }
-
-      const result = await updateTaskMutation.mutateAsync({
-        taskId: task.id,
-        updates: updateData,
-      });
-
-      if (result.success) {
-        toast.success("Task accepted successfully");
-        onClose();
-      } else {
-        toast.error("Failed to accept task");
-      }
-    } catch (error) {
-      console.error("Error accepting task:", error);
-      toast.error("An error occurred while accepting the task");
-    } finally {
-      setIsUpdating(false);
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "accepted":
+        return "Accepted";
+      case "redo":
+        return "Needs Redo";
+      case "submitted":
+        return "Submitted";
+      default:
+        return "Pending";
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md rounded-3xl">
         <DialogHeader>
           <div className="flex items-start justify-between">
-            <DialogTitle className="text-xl font-semibold text-gray-900">
-              {task.title}
-            </DialogTitle>
+            <div className="space-y-1">
+              <DialogTitle className="text-xl font-bold text-gray-900">
+                {task.taskTitle}
+              </DialogTitle>
+              <Badge
+                className={`${getStatusColor(task.taskStatus)} text-white`}
+              >
+                {getStatusLabel(task.taskStatus)}
+              </Badge>
+            </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -111,37 +72,42 @@ export default function ViewTaskModal({
 
         <div className="space-y-6 mt-2">
           {/* Description */}
-          {task.description && (
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {task.description}
-            </p>
+          {task.taskDescription && (
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Description
+              </label>
+              <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100">
+                {task.taskDescription}
+              </p>
+            </div>
           )}
 
           {/* Date Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm text-gray-600 font-medium">
-                Start date <span className="text-red-500">*</span>
+              <label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Start date
               </label>
-              <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+              <div className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50">
                 <Calendar className="w-4 h-4 text-gray-400" />
                 <span className="text-sm text-gray-700">
-                  {task.start_date
-                    ? format(new Date(task.start_date), "dd/MM/yyyy")
+                  {task.taskStartDate
+                    ? format(new Date(task.taskStartDate), "dd MMM yyyy")
                     : "Not set"}
                 </span>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm text-gray-600 font-medium">
-                Due date <span className="text-red-500">*</span>
+              <label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Due date
               </label>
-              <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+              <div className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-700">
-                  {task.end_date
-                    ? format(new Date(task.end_date), "dd/MM/yyyy")
+                <span className="text-sm text-gray-700 font-medium text-orange-600">
+                  {task.taskEndDate
+                    ? format(new Date(task.taskEndDate), "dd MMM yyyy")
                     : "Not set"}
                 </span>
               </div>
@@ -150,58 +116,37 @@ export default function ViewTaskModal({
 
           {/* Submission Link */}
           <div className="space-y-1.5">
-            <label className="text-sm text-gray-600 font-medium">
+            <label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
               Submission link
             </label>
-
-            {task.submission_link ? (
+            {task.taskSubmissionLink ? (
               <a
-                href={task.submission_link}
+                href={task.taskSubmissionLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-3 py-2 text-sm text-blue-600 hover:text-blue-700 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors truncate"
+                className="flex items-center gap-2 px-3 py-2.5 text-sm text-blue-600 hover:text-blue-700 border border-blue-100 rounded-xl bg-blue-50/50 transition-colors truncate"
               >
-                {task.submission_link}
+                <LinkIcon className="w-4 h-4 shrink-0" />
+                <span className="truncate">{task.taskSubmissionLink}</span>
               </a>
             ) : (
-              <div className="px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-lg bg-gray-50">
-                No Link available
+              <div className="px-3 py-2.5 text-sm text-gray-400 border border-gray-200 rounded-xl bg-gray-50 italic">
+                No submission link provided
               </div>
             )}
           </div>
 
           {/* Remarks */}
-          <div className="space-y-1.5">
-            <label className="text-sm text-gray-600 font-medium">Remarks</label>
-            <Textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Describe the task"
-              rows={4}
-              className="resize-none text-sm"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={handleSend}
-              disabled={isUpdating || !remarks.trim()}
-              className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-6"
-            >
-              {isUpdating ? "Sending..." : "Send"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCloseTask}
-              disabled={isUpdating}
-              className="rounded-full px-6"
-            >
-              {isUpdating ? "Processing..." : "Close Task"}
-            </Button>
-          </div>
+          {task.taskReviewRemarks && (
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Review Remarks
+              </label>
+              <div className="text-sm text-gray-700 leading-relaxed bg-orange-50/30 p-3 rounded-xl border border-orange-100">
+                {task.taskReviewRemarks}
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
