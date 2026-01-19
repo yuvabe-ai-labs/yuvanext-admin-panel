@@ -61,10 +61,9 @@ const SignIn = () => {
         });
         return;
       }
+      const user = authData?.user as { role?: string };
 
-      // Check if user has admin role
-      if (!authData?.user || authData.user.role !== "admin") {
-        // Sign out the user immediately if they're not an admin
+      if (!user || user.role !== "admin") {
         await authClient.signOut();
 
         toast({
@@ -105,7 +104,7 @@ const SignIn = () => {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-6 px-8">
             <img src={signinLogo} alt="Sign in Logo" className="w-28 h-auto" />
-            <p className="text-white text-base font-medium max-w-xl leading-relaxed">
+            <p className="text-white text-base font-medium max-w-xl leading-relaxing">
               Welcome to the Admin Panel. Only verified admins can log in here.
             </p>
           </div>
