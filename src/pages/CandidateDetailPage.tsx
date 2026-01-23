@@ -5,6 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCandidateDetail } from "@/hooks/useViewProfile";
+import { useDeactivateAccount, useActivateAccount } from "@/hooks/useSuspend";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import {
   Mail,
   Phone,
@@ -18,14 +31,39 @@ import {
   Globe,
   MapPin,
   ChevronLeft,
-  Calendar,
   Briefcase,
+  Ban,
+  Check,
 } from "lucide-react";
 
 export default function CandidateDetailPage() {
   const { applicationId } = useParams<{ applicationId: string }>();
   const navigate = useNavigate();
   const { data: profile, isLoading, error } = useCandidateDetail(applicationId);
+  const deactivateMutation = useDeactivateAccount();
+  const activateMutation = useActivateAccount();
+
+  const handleSuspendAccount = async () => {
+    if (!profile?.userId) return;
+    try {
+      await deactivateMutation.mutateAsync(profile.userId);
+      toast.success(`${profile?.name}'s account has been suspended`);
+    } catch (error) {
+      console.error("Error suspending account:", error);
+      toast.error("Failed to suspend account. Please try again.");
+    }
+  };
+
+  const handleActivateAccount = async () => {
+    if (!profile?.userId) return;
+    try {
+      await activateMutation.mutateAsync(profile.userId);
+      toast.success(`${profile?.name}'s account has been reactivated`);
+    } catch (error) {
+      console.error("Error activating account:", error);
+      toast.error("Failed to reactivate account. Please try again.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -67,6 +105,7 @@ export default function CandidateDetailPage() {
     : [];
   const courses = Array.isArray(profile.course) ? profile.course : [];
   const languages = Array.isArray(profile.language) ? profile.language : [];
+  const isInactive = profile.userAccountStatus;
 
   // Extract social links if they exist
   const socialLinks = profile.socialLinks
@@ -88,18 +127,6 @@ export default function CandidateDetailPage() {
     return Globe;
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "";
-    try {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -115,7 +142,7 @@ export default function CandidateDetailPage() {
             <span className="text-sm">Back</span>
           </button>
           <h1 className="text-2xl font-bold text-center flex-1">
-            Candidate Profile
+            Applied For {profile.internshipName}
           </h1>
           <div className="w-20"></div>
         </div>
@@ -142,9 +169,11 @@ export default function CandidateDetailPage() {
                 </Avatar>
 
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-900">
-                    {profile.name || "Anonymous"}
-                  </h2>
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {profile.name}
+                    </h2>
+                  </div>
 
                   {profile.profileSummary && (
                     <p className="text-gray-600 mb-4 leading-relaxed">
@@ -179,41 +208,83 @@ export default function CandidateDetailPage() {
                     )}
                   </div>
 
-                  {/* Additional Info Badges */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {profile.experienceLevel && (
-                      <Badge variant="outline" className="px-3 py-1">
-                        {profile.experienceLevel}
-                      </Badge>
-                    )}
-                    {profile.gender && (
-                      <Badge variant="outline" className="px-3 py-1 capitalize">
-                        {profile.gender}
-                      </Badge>
-                    )}
-                    {profile.maritalStatus && (
-                      <Badge variant="outline" className="px-3 py-1 capitalize">
-                        {profile.maritalStatus}
-                      </Badge>
-                    )}
-                    {profile.isDifferentlyAbled && (
-                      <Badge variant="outline" className="px-3 py-1">
-                        Differently Abled
-                      </Badge>
-                    )}
-                    {profile.hasCareerBreak && (
-                      <Badge variant="outline" className="px-3 py-1">
-                        Career Break
-                      </Badge>
+                  <div className="flex items-center gap-4">
+                    {/* Suspend/Activate Button with AlertDialog */}
+                    {!isInactive ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="inline-flex items-center gap-2 bg-transparent rounded-full py-1 px-3 border border-red-500 cursor-pointer hover:bg-red-50 transition-colors">
+                            <Ban className="w-4 h-4 text-red-500" />
+                            <span className="font-medium text-red-500 text-sm">
+                              Suspend Account
+                            </span>
+                          </button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Suspend this account?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will suspend {profile.name}'s account
+                              immediately. They will lose access to the
+                              platform.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleSuspendAccount}
+                              disabled={deactivateMutation.isPending}
+                              className="bg-red-600 text-white hover:bg-red-700"
+                            >
+                              {deactivateMutation.isPending
+                                ? "Suspending..."
+                                : "Suspend Account"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="inline-flex items-center gap-2 bg-transparent rounded-full py-1 px-3 border border-green-500 cursor-pointer hover:bg-green-50 transition-colors">
+                            <Check className="w-4 h-4 text-green-500" />
+                            <span className="font-medium text-green-500 text-sm">
+                              Reactivate Account
+                            </span>
+                          </button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Reactivate this account?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will restore {profile.name}'s access to the
+                              platform.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleActivateAccount}
+                              disabled={activateMutation.isPending}
+                              className="bg-green-600 text-white hover:bg-green-700"
+                            >
+                              {activateMutation.isPending
+                                ? "Reactivating..."
+                                : "Reactivate Account"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     )}
                   </div>
-
-                  {profile.dateOfBirth && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <span>Born: {formatDate(profile.dateOfBirth)}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </CardContent>
@@ -488,7 +559,7 @@ export default function CandidateDetailPage() {
                               </a>
                             </Button>
                           );
-                        }
+                        },
                       )}
                     </div>
                   </CardContent>

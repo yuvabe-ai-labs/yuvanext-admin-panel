@@ -80,11 +80,9 @@ export interface CandidateProfile {
     hasCareerBreak: boolean | null;
     createdAt: string;
     updatedAt: string | null;
-
     skills: string[];
     interests: string[];
     lookingFor: string[];
-
     avatarUrl: string | null;
     phone: string | null;
     gender: Gender | null;
@@ -96,6 +94,6 @@ export interface CandidateProfile {
     course: unknown[];
     internship: unknown[];
     projects: unknown[];
-
     socialLinks: unknown | null;
+    internshipName: string;
 }

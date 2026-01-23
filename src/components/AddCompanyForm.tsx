@@ -254,6 +254,48 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
               )}
             />
 
+            {/* Services Offered - ADDED MISSING FIELD */}
+            <FormField
+              control={form.control}
+              name="services"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-gray-600">
+                    Services Offered *
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Type here"
+                      {...field}
+                      className="min-h-[100px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Achievements - ADDED MISSING FIELD */}
+            <FormField
+              control={form.control}
+              name="achievements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-gray-600">
+                    Achievements *
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Type here"
+                      {...field}
+                      className="min-h-[100px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Terms */}
             <FormField
               control={form.control}

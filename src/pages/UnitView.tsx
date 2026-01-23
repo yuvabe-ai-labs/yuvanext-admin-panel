@@ -93,8 +93,8 @@ const UnitView = () => {
   }
 
   const internships = unit.internships || [];
-  // Use userAccountStatus boolean to determine if unit is active
-  const isActive = unit.userAccountStatus ?? true;
+
+  const isInactive = unit.userAccountStatus;
 
   return (
     <div className="min-h-screen bg-background">
@@ -225,8 +225,7 @@ const UnitView = () => {
                     </button>
                   )}
 
-                  {/* Suspend/Activate Button with AlertDialog */}
-                  {isActive ? (
+                  {!isInactive ? (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <button className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-red-500 cursor-pointer hover:bg-red-50 transition-colors">
