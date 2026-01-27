@@ -19,7 +19,6 @@ export interface AddCompanyRequest {
     aboutCompany: string;
     serviceOffered: string;
     achievements: string;
-    password: string;
 }
 
 export interface AddCompanyResponse {
