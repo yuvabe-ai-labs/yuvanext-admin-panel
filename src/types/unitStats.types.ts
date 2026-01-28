@@ -10,8 +10,8 @@ export type CompanyType =
     | "non_auroville_unit";
 
 export interface AddCompanyRequest {
-    companyName: string;
-    companyEmail: string;
+    name: string;
+    email: string;
     contactNumber: string;
     companyType: CompanyType;
     industryType: string;

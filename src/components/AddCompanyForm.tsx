@@ -57,8 +57,8 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
   const onSubmit = async (data: CompanyFormType) => {
     try {
       const payload = {
-        companyName: data.companyName,
-        companyEmail: data.companyEmail,
+        name: data.companyName,
+        email: data.companyEmail,
         contactNumber: data.contactNumber,
         companyType: (data.companyType === "auroville"
           ? "auroville_unit"
@@ -68,7 +68,6 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
         aboutCompany: data.about,
         serviceOffered: data.services,
         achievements: data.achievements,
-        password: "",
       };
 
       await addCompany(payload);
