@@ -20,10 +20,10 @@ import {
   useShortlistedCandidates,
   useHiredCandidates,
   useInterviewSchedule,
-} from "@/hooks/useApplications"; //
+} from "@/hooks/useApplications";
 import HiredCandidateCard from "@/components/HiredCandidateCard";
 import InterviewScheduledCard from "@/components/InterviewScheduledCard";
-import StatCard from "@/components/StatCard"; //
+import StatCard from "@/components/StatCard";
 
 export default function CandidateManagement() {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function CandidateManagement() {
   const [activeTab, setActiveTab] = useState<
     "all" | "hired" | "interviewed" | "shortlisted"
   >("all");
-  const pageSize = 12;
+  const pageSize = 6;
 
   const appliedQuery = useAppliedCandidates({
     page: activeTab === "all" ? page : 1,
@@ -269,7 +269,7 @@ export default function CandidateManagement() {
                             </p>
                             <Badge
                               className={`${getStatusColor(
-                                item.applicationStatus || item.status
+                                item.applicationStatus || item.status,
                               )} text-xs sm:text-sm px-2 sm:px-3 py-1 capitalize`}
                             >
                               {item.applicationStatus || item.status}
@@ -335,7 +335,7 @@ export default function CandidateManagement() {
                           size="lg"
                           className="w-full border-2 border-teal-500 text-teal-600 hover:bg-teal-50 text-sm py-3 rounded-full cursor-pointer mt-4"
                           onClick={() =>
-                            navigate(`/candidate/${item.candidateId}`)
+                            navigate(`/candidate/${item.applicationId}`)
                           }
                         >
                           View Profile

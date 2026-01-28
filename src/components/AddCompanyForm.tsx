@@ -57,8 +57,8 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
   const onSubmit = async (data: CompanyFormType) => {
     try {
       const payload = {
-        companyName: data.companyName,
-        companyEmail: data.companyEmail,
+        name: data.companyName,
+        email: data.companyEmail,
         contactNumber: data.contactNumber,
         companyType: (data.companyType === "auroville"
           ? "auroville_unit"
@@ -68,7 +68,6 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
         aboutCompany: data.about,
         serviceOffered: data.services,
         achievements: data.achievements,
-        password: "",
       };
 
       await addCompany(payload);
@@ -241,6 +240,48 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                 <FormItem>
                   <FormLabel className="font-bold text-gray-600">
                     About the Company *
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Type here"
+                      {...field}
+                      className="min-h-[100px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Services Offered - ADDED MISSING FIELD */}
+            <FormField
+              control={form.control}
+              name="services"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-gray-600">
+                    Services Offered *
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Type here"
+                      {...field}
+                      className="min-h-[100px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Achievements - ADDED MISSING FIELD */}
+            <FormField
+              control={form.control}
+              name="achievements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-gray-600">
+                    Achievements *
                   </FormLabel>
                   <FormControl>
                     <Textarea

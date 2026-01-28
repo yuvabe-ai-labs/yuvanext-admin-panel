@@ -2,19 +2,42 @@ import { Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
+import { calculateOverallTaskProgress } from "@/utils/taskProgress";
+import { useMemo } from "react";
 
 interface CandidateInfoCardProps {
-  applicationId: string | undefined;
+  applicationId: string;
 }
 
 export default function CandidateInfoCard({
   applicationId,
 }: CandidateInfoCardProps) {
-  const { data: applicationData, isLoading } =
-    useTasksByApplicationId(applicationId);
+  const { data, isLoading, error } = useTasksByApplicationId(applicationId);
 
-  // FIXED: Access directly since the API returns a single object (data), not an array
-  const applicationDetails = applicationData;
+  // Calculate task progress
+  const taskProgress = useMemo(() => {
+    if (!data || !data.tasks || data.tasks.length === 0) {
+      console.log("No tasks available");
+      return 0;
+    }
+
+    const progress = calculateOverallTaskProgress(data.tasks);
+    console.log("Calculated progress:", progress + "%");
+    return progress;
+  }, [data?.tasks]);
+
+  // Memoize circle calculations
+  const circleMetrics = useMemo(() => {
+    const radius = 48;
+    const circumference = 2 * Math.PI * radius;
+    const progressOffset = circumference * (1 - taskProgress / 100);
+    console.log("Circle metrics:", {
+      progress: taskProgress,
+      circumference,
+      offset: progressOffset,
+    });
+    return { circumference, progressOffset };
+  }, [taskProgress]);
 
   if (isLoading) {
     return (
@@ -31,7 +54,7 @@ export default function CandidateInfoCard({
     );
   }
 
-  if (!applicationDetails) {
+  if (error || !data) {
     return (
       <Card className="w-full p-6">
         <p className="text-red-500 text-center">
@@ -40,6 +63,17 @@ export default function CandidateInfoCard({
       </Card>
     );
   }
+
+  const candidate = {
+    name: data.applicantName,
+    email: data.applicantEmail,
+    phone: data.candidatePhoneNumber,
+    avatarUrl: data.candidateAvatarUrl,
+  };
+
+  const internship = {
+    title: data.internshipName,
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -57,11 +91,11 @@ export default function CandidateInfoCard({
         <div className="relative">
           <Avatar className="w-20 h-20">
             <AvatarImage
-              src={applicationDetails.candidateAvatarUrl || undefined}
-              alt={applicationDetails.applicantName || "User"}
+              src={candidate.avatarUrl || undefined}
+              alt={candidate.name || "User"}
             />
-            <AvatarFallback className="bg-linear-to-br from-teal-400 to-teal-600 text-white text-xl font-semibold">
-              {getInitials(applicationDetails.applicantName || "NA")}
+            <AvatarFallback className="bg-gradient-to-br from-teal-400 to-teal-600 text-white text-xl font-semibold">
+              {getInitials(candidate.name || "NA")}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -69,22 +103,22 @@ export default function CandidateInfoCard({
         {/* Candidate Info */}
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-900 mb-1">
-            {applicationDetails.applicantName || "N/A"}
+            {candidate.name || "N/A"}
           </h2>
           <p className="text-gray-600 font-medium mb-3">
-            {applicationDetails.internshipName || "N/A"}
+            {internship.title || "N/A"}
           </p>
 
           {/* Contact Details */}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              <span>{applicationDetails.applicantEmail || "N/A"}</span>
+              <span>{candidate.email || "N/A"}</span>
             </div>
-            {applicationDetails.candidatePhoneNumber && (
+            {candidate.phone && (
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4" />
-                <span>{applicationDetails.candidatePhoneNumber}</span>
+                <span>{candidate.phone}</span>
               </div>
             )}
           </div>
@@ -93,7 +127,8 @@ export default function CandidateInfoCard({
         {/* Task Progress Circle */}
         <div className="flex flex-col items-center gap-1">
           <div className="relative w-28 h-28">
-            <svg className="transform rotate-90 w-28 h-28">
+            <svg className="transform -rotate-90 w-28 h-28">
+              {/* Background circle */}
               <circle
                 cx="56"
                 cy="56"
@@ -102,7 +137,7 @@ export default function CandidateInfoCard({
                 strokeWidth="10"
                 fill="none"
               />
-
+              {/* Progress circle */}
               <circle
                 cx="56"
                 cy="56"
@@ -110,11 +145,20 @@ export default function CandidateInfoCard({
                 stroke="#00C271"
                 strokeWidth="10"
                 fill="none"
-                strokeDasharray={2 * Math.PI * 48}
+                strokeDasharray={circleMetrics.circumference}
+                strokeDashoffset={circleMetrics.progressOffset}
                 strokeLinecap="round"
                 className="transition-all duration-700 ease-out"
               />
             </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center leading-tight">
+              <span className="text-base font-semibold text-gray-500">
+                {taskProgress}%
+              </span>
+              <span className="text-[9px] font-medium text-gray-500 mt-0.5">
+                Projects Progress
+              </span>
+            </div>
           </div>
         </div>
       </div>
