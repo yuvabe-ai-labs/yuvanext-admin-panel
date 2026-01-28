@@ -24,13 +24,11 @@ export const getUnitStatsOverview = async (): Promise<UnitStats> => {
     }
 };
 
-const DEFAULT_PASSWORD = "Yuvanext@25";
 
 export const addCompany = async (payload: AddCompanyRequest) => {
     try {
         const response = await axiosInstance.post("/admin/units/add-company", {
             ...payload,
-            password: payload.password || DEFAULT_PASSWORD,
         });
         return handleApiResponse<AddCompanyResponse>(
             response,

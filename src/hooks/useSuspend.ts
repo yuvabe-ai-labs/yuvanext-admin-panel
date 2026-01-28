@@ -17,6 +17,8 @@ export const useDeactivateAccount = () => {
             queryClient.invalidateQueries({
                 queryKey: ["units"],
             });
+            queryClient.invalidateQueries({ queryKey: ["candidate-detail"] });
+            queryClient.invalidateQueries({ queryKey: ["unit-detail"] });
         },
     });
 };
@@ -31,6 +33,8 @@ export const useActivateAccount = () => {
             queryClient.invalidateQueries({
                 queryKey: ["units"],
             });
+            queryClient.invalidateQueries({ queryKey: ["candidate-detail"] });
+            queryClient.invalidateQueries({ queryKey: ["unit-detail"] });
         },
     });
 };

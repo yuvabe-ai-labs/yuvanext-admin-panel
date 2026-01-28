@@ -7,7 +7,7 @@ import TaskCalendar from "@/components/TaskCalendar";
 import { Badge } from "@/components/ui/badge";
 import CandidateInfoCard from "@/components/CandidateInfoCard";
 import { ChevronLeft } from "lucide-react";
-import type { TaskItem } from "@/types/candidateTasks.types";
+import type { Task } from "@/types/candidateTasks.types";
 
 export default function UnitCandidateTasks() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function UnitCandidateTasks() {
   };
 
   // Transform TaskItem to match TaskCalendar expectations
-  const transformedTasks = tasks.map((task: TaskItem) => ({
+  const transformedTasks = tasks.map((task: Task) => ({
     id: task.taskId,
     title: task.taskTitle,
     description: task.taskDescription,
@@ -125,7 +125,7 @@ export default function UnitCandidateTasks() {
                 </div>
               ) : (
                 <div className="space-y-3  grow pr-2">
-                  {tasks.map((task: TaskItem) => (
+                  {tasks.map((task: Task) => (
                     <div
                       key={task.taskId}
                       className="bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-md"
