@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
 import { calculateOverallTaskProgress } from "@/utils/taskProgress";
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 
 interface CandidateInfoCardProps {
   applicationId: string;
@@ -13,7 +13,7 @@ export default function CandidateInfoCard({
   applicationId,
 }: CandidateInfoCardProps) {
   const { data, isLoading, error } = useTasksByApplicationId(applicationId);
-  
+
   // Calculate task progress
   const taskProgress = useMemo(() => {
     if (!data || !data.tasks || data.tasks.length === 0) {
