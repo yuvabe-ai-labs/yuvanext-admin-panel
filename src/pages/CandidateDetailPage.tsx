@@ -34,6 +34,7 @@ import {
   Briefcase,
   Ban,
   Check,
+  Github,
 } from "lucide-react";
 
 export default function CandidateDetailPage() {
@@ -108,16 +109,15 @@ export default function CandidateDetailPage() {
   const isInactive = profile.userAccountStatus;
 
   // Extract social links if they exist
-  const socialLinks = profile.socialLinks
-    ? typeof profile.socialLinks === "object"
-      ? Object.entries(profile.socialLinks)
-      : []
+  const socialLinks = Array.isArray(profile.socialLinks) 
+    ? profile.socialLinks 
     : [];
 
   const getSocialIcon = (platform: string) => {
     const platformLower = platform.toLowerCase();
 
     if (platformLower.includes("linkedin")) return Linkedin;
+    if (platformLower.includes("github")) return Github;
     if (platformLower.includes("instagram")) return Instagram;
     if (platformLower.includes("facebook")) return Facebook;
     if (platformLower.includes("twitter") || platformLower.includes("x"))
@@ -539,28 +539,26 @@ export default function CandidateDetailPage() {
                       Links
                     </h3>
                     <div className="flex flex-wrap gap-3">
-                      {socialLinks.map(
-                        ([platform, url]: [string, any], idx: number) => {
-                          const Icon = getSocialIcon(platform);
-                          return (
-                            <Button
-                              key={idx}
-                              variant="outline"
-                              size="icon"
-                              className="rounded-full w-10 h-10 border-gray-300 hover:bg-gray-50"
-                              asChild
+                      {socialLinks.map((link: any, idx: number) => {
+                        const Icon = getSocialIcon(link.platform);
+                        return (
+                          <Button
+                            key={link.id || idx}
+                            variant="outline"
+                            size="icon"
+                            className="rounded-full w-10 h-10 border-gray-300 hover:bg-gray-50"
+                            asChild
+                          >
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
                             >
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Icon className="w-4 h-4 text-gray-700" />
-                              </a>
-                            </Button>
-                          );
-                        },
-                      )}
+                              <Icon className="w-4 h-4 text-gray-700" />
+                            </a>
+                          </Button>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>

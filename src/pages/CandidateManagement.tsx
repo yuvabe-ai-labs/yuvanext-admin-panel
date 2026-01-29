@@ -37,22 +37,22 @@ export default function CandidateManagement() {
   const appliedQuery = useAppliedCandidates({
     page: activeTab === "all" ? page : 1,
     limit: pageSize,
-    search: searchQuery,
+    search: activeTab === "all" ? searchQuery : "",
   });
   const shortlistedQuery = useShortlistedCandidates({
     page: activeTab === "shortlisted" ? page : 1,
     limit: pageSize,
-    search: searchQuery,
+    search: activeTab === "shortlisted" ? searchQuery : "",
   });
   const hiredQuery = useHiredCandidates({
     page: activeTab === "hired" ? page : 1,
     limit: pageSize,
-    search: searchQuery,
+    search: activeTab === "hired" ? searchQuery : "",
   });
   const interviewQuery = useInterviewSchedule({
     page: activeTab === "interviewed" ? page : 1,
     limit: pageSize,
-    search: searchQuery,
+    search: activeTab === "interviewed" ? searchQuery : "",
   });
 
   const getActiveQuery = () => {
@@ -71,8 +71,14 @@ export default function CandidateManagement() {
   };
 
   const currentQuery = getActiveQuery();
-  const items = currentQuery.data?.data ?? [];
+  const rawItems = currentQuery.data?.data ?? [];
   const pagination = currentQuery.data?.pagination;
+
+  const items = searchQuery
+    ? rawItems.filter((item: any) =>
+        item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : rawItems;
 
   const handleSearch = (val: string) => {
     setSearchQuery(val);
