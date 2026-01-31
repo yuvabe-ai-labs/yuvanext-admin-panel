@@ -1,145 +1,14 @@
-// import { Card, CardContent } from "@/components/ui/card";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Button } from "./ui/button";
-// import { MoveUpRight } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
-
-// interface HiredCandidateCardProps {
-//   id: string;
-//   name: string;
-//   avatar_url: string | null;
-//   internship_title: string;
-//   duration?: string | null;
-//   job_type?: string | null;
-//   unit_name?: string | null;
-//   unit_avatar_url?: string | null;
-// }
-
-// export default function HiredCandidateCard({
-//   id,
-//   name,
-//   avatar_url,
-//   internship_title,
-//   duration,
-//   job_type,
-//   unit_name,
-//   unit_avatar_url,
-// }: HiredCandidateCardProps) {
-//   const navigate = useNavigate();
-
-//   const formatJobType = (type: string | null | undefined) => {
-//     if (!type) return "Not specified";
-
-//     const jobTypeMap: { [key: string]: string } = {
-//       full_time: "Full time",
-//       part_time: "Part time",
-//       contract: "Contract",
-//       internship: "Internship",
-//     };
-
-//     return jobTypeMap[type] || type;
-//   };
-
-//   const handleViewTasks = (applicationId: string) => {
-//     navigate(`/candidate-tasks/${applicationId}`);
-//   };
-
-//   return (
-//     <Card className="border border-gray-200 rounded-3xl hover:shadow-lg transition-shadow">
-//       <CardContent className="p-6 space-y-4">
-//         {/* Header Section */}
-//         <div className="flex items-start justify-between">
-//           <div className="flex-1">
-//             <p className="text-sm text-gray-600 mb-3">{internship_title}</p>
-
-//             <div className="flex items-center gap-4">
-//               {/* Avatar with Unit Logo Overlay */}
-//               <div className="relative">
-//                 <Avatar className="w-20 h-20">
-//                   <AvatarImage
-//                     src={avatar_url || undefined}
-//                     alt={name}
-//                     className="object-cover"
-//                   />
-//                   <AvatarFallback className="text-lg font-semibold bg-gray-200">
-//                     {name
-//                       .split(" ")
-//                       .map((n) => n[0])
-//                       .join("")
-//                       .toUpperCase()}
-//                   </AvatarFallback>
-//                 </Avatar>
-
-//                 {/* Unit Logo Badge */}
-//                 <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-white shadow-md overflow-hidden">
-//                   {unit_avatar_url ? (
-//                     <img
-//                       src={unit_avatar_url}
-//                       alt={unit_name || "Unit"}
-//                       className="w-full h-full object-cover"
-//                     />
-//                   ) : (
-//                     <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-//                       <span className="text-white text-[10px] font-bold">
-//                         {unit_name
-//                           ?.split(" ")
-//                           .map((n) => n[0])
-//                           .join("")
-//                           .toUpperCase()
-//                           .slice(0, 2) || "UN"}
-//                       </span>
-//                     </div>
-//                   )}
-//                 </div>
-//               </div>
-
-//               {/* Name and Hired Status */}
-//               <div>
-//                 <h3 className="text-xl font-bold text-gray-900 mb-1">{name}</h3>
-//                 <div className="flex items-center gap-2">
-//                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
-//                   <span className="text-sm text-gray-600">
-//                     Hired by {unit_name || "Unknown Unit"}
-//                   </span>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Duration Info */}
-//           <div className="text-right text-sm text-gray-600">
-//             <span>
-//               {duration || "Duration not specified"} | {formatJobType(job_type)}
-//             </span>
-//           </div>
-//         </div>
-
-//         <div className="flex justify-end pt-2">
-//           <Button
-//             variant="outline"
-//             className="rounded-full text-gray-600 cursor-pointer"
-//             onClick={() => handleViewTasks(id)} // id is now applicationId
-//           >
-//             View Tasks
-//             <MoveUpRight className="w-4 h-4 ml-2" />
-//           </Button>
-//         </div>
-//       </CardContent>
-//     </Card>
-//   );
-// }
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { MoveUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTasksByApplicationId } from "@/hooks/useCandidateTask"; //
-import { calculateOverallTaskProgress } from "@/utils/taskProgress"; //
+import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
+import { calculateOverallTaskProgress } from "@/utils/taskProgress";
 import { useMemo } from "react";
 
 interface HiredCandidateCardProps {
-  id: string; // This is the applicationId
+  id: string;
   name: string;
   avatar_url: string | null;
   internship_title: string;
@@ -188,8 +57,9 @@ export default function HiredCandidateCard({
           <div className="flex-1">
             <p className="text-sm text-gray-500 mb-3">{internship_title}</p>
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Avatar className="w-16 h-16">
+              <div className="flex -space-x-4">
+                {/* Candidate Avatar */}
+                <Avatar className="w-16 h-16 border-2 border-white relative z-10">
                   <AvatarImage
                     src={avatar_url || undefined}
                     className="object-cover"
@@ -198,7 +68,9 @@ export default function HiredCandidateCard({
                     {name[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-black flex items-center justify-center border-2 border-white overflow-hidden">
+
+                {/* Unit Avatar - Same size as candidate */}
+                <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center border-2 border-white overflow-hidden relative z-20">
                   {unit_avatar_url ? (
                     <img
                       src={unit_avatar_url}
@@ -206,15 +78,18 @@ export default function HiredCandidateCard({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-white text-[8px] font-bold">X</span>
+                    <span className="text-white text-xl font-bold">X</span>
                   )}
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">{name}</h3>
+                <h3 className="text-xl font-bold text-gray-900">{name}</h3>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                  <span className="text-xs text-gray-500">
+                  {/* Status with Green Ring */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-emerald-500">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                  </div>
+                  <span className="text-sm text-gray-500">
                     Hired by {unit_name}
                   </span>
                 </div>
@@ -226,7 +101,7 @@ export default function HiredCandidateCard({
           </div>
         </div>
 
-        {/* Progress Bar Section (Matches your provided image) */}
+        {/* Progress Bar Section */}
         <div className="space-y-2">
           <div className="flex justify-between items-end">
             <span className="text-sm font-bold text-slate-700">

@@ -78,7 +78,7 @@ export default function CompanyManagement() {
     units?.filter(
       (unit) =>
         unit.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        unit.email?.toLowerCase().includes(searchQuery.toLowerCase())
+        unit.email?.toLowerCase().includes(searchQuery.toLowerCase()),
     ) || [];
 
   return (
@@ -188,12 +188,12 @@ export default function CompanyManagement() {
                             </Badge>
                           </div>
                           <p className="text-xs text-gray-500">{unit.email}</p>
-                          <div className="flex items-center gap-4 text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tight">
+                          <div className="flex items-center gap-4 text-[10px] text-gray-400 mt-1 tracking-tight">
                             <span>
                               {unit.totalApplications || 0} Applications
                             </span>
                             <span>
-                              {unit.totalActiveInternships || 0} Internships
+                              {unit.totalActiveInternships || 0} Active Posts
                             </span>
                           </div>
                         </div>
@@ -247,7 +247,7 @@ export default function CompanyManagement() {
                                     onClick={() =>
                                       handleSuspendAccount(
                                         unit.userId,
-                                        unit.name
+                                        unit.name,
                                       )
                                     }
                                     className="bg-red-600"
@@ -283,7 +283,7 @@ export default function CompanyManagement() {
                                     onClick={() =>
                                       handleActivateAccount(
                                         unit.userId,
-                                        unit.name
+                                        unit.name,
                                       )
                                     }
                                     className="bg-green-600"
