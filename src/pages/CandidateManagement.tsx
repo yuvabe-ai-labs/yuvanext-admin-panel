@@ -76,7 +76,7 @@ export default function CandidateManagement() {
 
   const items = searchQuery
     ? rawItems.filter((item: any) =>
-        item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        item.name?.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : rawItems;
 
@@ -161,7 +161,7 @@ export default function CandidateManagement() {
         </div>
 
         <div className="px-2 lg:px-10">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               {activeTab === "all"
                 ? "Candidates Management"
@@ -171,7 +171,7 @@ export default function CandidateManagement() {
                     ? "Scheduled Interviews"
                     : "Shortlisted Candidates"}
             </h2>
-            <div className="relative w-64">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search by names"
@@ -196,10 +196,13 @@ export default function CandidateManagement() {
           ) : (
             <>
               <div
-                className={`grid gap-6 ${activeTab === "hired" || activeTab === "interviewed" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}
+                className={`grid gap-6 ${
+                  activeTab === "hired" || activeTab === "interviewed"
+                    ? "grid-cols-1 lg:grid-cols-2"
+                    : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                }`}
               >
                 {items.map((item: any) => {
-                  // Handle specialized cards for Interview and Hired tabs
                   if (activeTab === "interviewed")
                     return (
                       <InterviewScheduledCard
@@ -234,7 +237,6 @@ export default function CandidateManagement() {
                       />
                     );
 
-                  // Standard Candidate UI Card for "All" and "Shortlisted" tabs
                   const skills = Array.isArray(item.skills) ? item.skills : [];
                   const interests = Array.isArray(item.interests)
                     ? item.interests
@@ -245,10 +247,9 @@ export default function CandidateManagement() {
                   return (
                     <Card
                       key={item.applicationId}
-                      className="min-w-[350px] border border-border/50 hover:shadow-lg transition-shadow rounded-3xl flex flex-col"
+                      className="w-full border border-border/50 hover:shadow-lg transition-shadow rounded-3xl flex flex-col"
                     >
                       <CardContent className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-5">
-                        {/* Header Section */}
                         <div className="flex items-center gap-3 sm:gap-5">
                           <Avatar className="w-16 h-16 sm:w-20 sm:h-20 ring-4 ring-green-500">
                             <AvatarImage
@@ -283,15 +284,13 @@ export default function CandidateManagement() {
                           </div>
                         </div>
 
-                        {/* Profile Summary */}
                         <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-3">
                           {profileSummary}
                         </p>
 
-                        {/* Skills and Interests */}
                         <div className="min-h-7">
                           {skills.length > 0 ? (
-                            <div className="flex gap-2 overflow-hidden">
+                            <div className="flex flex-wrap gap-2">
                               {skills
                                 .slice(0, 3)
                                 .map((skill: string, i: number) => (
@@ -313,7 +312,7 @@ export default function CandidateManagement() {
                               )}
                             </div>
                           ) : interests.length > 0 ? (
-                            <div className="flex gap-2 overflow-hidden">
+                            <div className="flex flex-wrap gap-2">
                               {interests
                                 .slice(0, 3)
                                 .map((interest: string, i: number) => (
@@ -335,7 +334,6 @@ export default function CandidateManagement() {
 
                         <div className="border-t border-border/40 mt-auto"></div>
 
-                        {/* Action Button */}
                         <Button
                           variant="outline"
                           size="lg"
