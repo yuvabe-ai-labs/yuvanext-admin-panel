@@ -20,7 +20,7 @@ import type { CompanyType } from "@/types/unitStats.types";
 
 const companySchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
-  companyEmail: z.string().email("Invalid email").min(1, "Email is required"),
+  companyEmail: z.string().min(1, "Email is required").email("Invalid email"),
   contactNumber: z.string().min(8, "Contact number is required"),
   companyType: z.enum(["auroville", "non-auroville"], {
     message: "Company type is required",
@@ -71,7 +71,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
       };
 
       await addCompany(payload);
-      toast.success("Company created successfully!");
+      toast.success("Company Invited successfully!");
       onClose();
     } catch (err: any) {
       toast.error(err?.message || "Failed to add company.");

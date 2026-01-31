@@ -110,7 +110,7 @@ const UnitView = () => {
         )}
       </div>
 
-      <div className="md:-mt-33 pt-0 container p-0 md:px-30 md:py-10">
+      <div className="md:-mt-33 pt-0 container p-0 md:px-30 md:py-10 mx-auto">
         {/* Hero Section with Unit Info */}
         <Card className="relative border border-gray-200 md:mb-2.5 overflow-hidden bg-white rounded-none md:rounded-3xl">
           <CardContent className="p-7.5">
