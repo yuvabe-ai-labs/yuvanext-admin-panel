@@ -124,10 +124,10 @@ export default function CompanyManagement() {
                       {unit.email || "No email"}
                     </p>
 
-                    <div className="text-[10px] text-gray-400 flex items-center gap-3 mt-1 font-bold uppercase tracking-tight">
+                    <div className="text-[10px] text-gray-400 flex items-center gap-3 mt-1 tracking-tight">
                       <span>{unit.totalApplications || 0} Applications</span>
                       <span>
-                        {unit.totalActiveInternships || 0} Internships
+                        {unit.totalActiveInternships || 0} Active Posts
                       </span>
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export default function CompanyManagement() {
                               onClick={() =>
                                 handleSuspendAccount(
                                   unit.userId,
-                                  unit.name || "Unknown Unit"
+                                  unit.name || "Unknown Unit",
                                 )
                               }
                               disabled={deactivateMutation.isPending}
@@ -236,7 +236,7 @@ export default function CompanyManagement() {
                               onClick={() =>
                                 handleActivateAccount(
                                   unit.userId,
-                                  unit.name || "Unknown Unit"
+                                  unit.name || "Unknown Unit",
                                 )
                               }
                               disabled={activateMutation.isPending}
