@@ -73,7 +73,6 @@ export default function CreateInternshipDialog({
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-  // Use the requested hook for listing units
   const { data: units } = useUnits(1, 100);
   const { mutate: createInternship, isPending: isSubmitting } =
     useCreateInternship();
@@ -85,6 +84,7 @@ export default function CreateInternshipDialog({
     reset,
     setValue,
     watch,
+    trigger, // Added trigger to manually re-validate form
     formState: { errors, isValid },
   } = useForm<CreateInternshipFormType>({
     resolver: zodResolver(createInternshipSchema),
@@ -109,7 +109,6 @@ export default function CreateInternshipDialog({
   const jobTitle = watch("title");
   const isJobRoleFilled = jobTitle && jobTitle.trim().length > 0;
 
-  // Date constants for deadline selection
   const currentYear = new Date().getFullYear();
   const monthNames = [
     "January",
@@ -145,40 +144,33 @@ export default function CreateInternshipDialog({
       };
 
       const section = sectionMap[fieldName];
-
-      // 1. Call the mutation
       const result = await generateAIContent({
         title: jobTitle,
         sections: [section],
       });
 
-      // DEBUG: Log the result to see the structure in your browser console
-      console.log("AI API Result:", result);
-
-      // 2. Access the data correctly based on your JSON structure
-      // We check if result itself has the section, or if it's inside result.data
       const aiData = result?.data || result;
       const generatedValue = aiData[section];
 
       if (generatedValue) {
-        // 3. Format the value (handling strings or arrays)
         const finalValue = Array.isArray(generatedValue)
           ? generatedValue.join("\n")
           : generatedValue;
 
-        // 4. Update the form
         setValue(fieldName, finalValue.trim(), {
           shouldValidate: true,
           shouldDirty: true,
         });
 
+        // FORCE VALIDATION: This ensures the 'isValid' state updates 
+        // immediately after AI fills the content.
+        await trigger();
+
         toast.success("AI content generated successfully!");
       } else {
-        console.error("Content missing for section:", section, "in:", result);
         toast.error("AI returned a success message but the content was empty.");
       }
     } catch (error) {
-      console.error("AI Generation Error:", error);
       toast.error("Failed to connect to AI server. Check console for details.");
     } finally {
       setAiLoadingField(null);
@@ -193,15 +185,17 @@ export default function CreateInternshipDialog({
     const updatedLanguages = [...languages];
     updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
     setLanguages(updatedLanguages);
-    setValue("language_requirements", updatedLanguages);
+    setValue("language_requirements", updatedLanguages, { shouldValidate: true });
+    trigger("language_requirements");
   };
 
   useEffect(() => {
     if (selectedDate && selectedMonth && selectedYear) {
       const formattedDate = `${selectedYear}-${selectedMonth.padStart(2, "0")}-${selectedDate.padStart(2, "0")}`;
-      setValue("application_deadline", formattedDate);
+      setValue("application_deadline", formattedDate, { shouldValidate: true });
+      trigger("application_deadline");
     }
-  }, [selectedDate, selectedMonth, selectedYear, setValue]);
+  }, [selectedDate, selectedMonth, selectedYear, setValue, trigger]);
 
   const onSubmit = (data: CreateInternshipFormType) => {
     const payload: CreateInternshipPayload = {
