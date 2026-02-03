@@ -19,17 +19,17 @@ import { useAddCompany } from "@/hooks/useUnitStats";
 import type { CompanyType } from "@/types/unitStats.types";
 
 const companySchema = z.object({
-  companyName: z.string().min(1, "Company name is required"),
-  companyEmail: z.string().min(1, "Email is required").email("Invalid email"),
-  contactNumber: z.string().min(8, "Contact number is required"),
+  companyName: z.string().min(1, "Company name is required").max(100, "Company name must not exceed 100 characters"),
+  companyEmail: z.string().min(1, "Email is required").email("Invalid email").max(100, "Email must not exceed 100 characters"),
+  contactNumber: z.string().min(8, "Contact number is required").max(15, "Contact number must not exceed 15 digits").regex(/^\d+$/, "Contact number must contain only numbers"),
   companyType: z.enum(["auroville", "non-auroville"], {
     message: "Company type is required",
   }),
-  industryType: z.string().min(1, "Industry type is required"),
-  address: z.string().min(1, "Address is required"),
-  about: z.string().min(1, "About is required"),
-  services: z.string().min(1, "Services ofered is required"),
-  achievements: z.string().min(1, "Achievements is required"),
+  industryType: z.string().min(1, "Industry type is required").max(100, "Industry type must not exceed 100 characters"),
+  address: z.string().min(1, "Address is required").max(500, "Address must not exceed 500 characters"),
+  about: z.string().min(1, "About is required").max(1000, "About must not exceed 1000 characters"),
+  services: z.string().min(1, "Services ofered is required").max(1000, "Services must not exceed 1000 characters"),
+  achievements: z.string().min(1, "Achievements is required").max(1000, "Achievements must not exceed 1000 characters"),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must accept terms and conditions",
   }),
@@ -105,6 +105,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Enter company name"
                       {...field}
                       className="rounded-full"
+                      maxLength={100}
                     />
                   </FormControl>
                   <FormMessage />
@@ -126,6 +127,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Enter email address"
                       {...field}
                       className="rounded-full"
+                      maxLength={100}
                     />
                   </FormControl>
                   <FormMessage />
@@ -147,6 +149,11 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Enter contact number"
                       {...field}
                       className="rounded-full"
+                      maxLength={15}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        field.onChange(value);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -204,6 +211,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Enter your company domain"
                       {...field}
                       className="rounded-full"
+                      maxLength={100}
                     />
                   </FormControl>
                   <FormMessage />
@@ -225,6 +233,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Type here"
                       {...field}
                       className="min-h-[100px]"
+                      maxLength={500}
                     />
                   </FormControl>
                   <FormMessage />
@@ -246,6 +255,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Type here"
                       {...field}
                       className="min-h-[100px]"
+                      maxLength={1000}
                     />
                   </FormControl>
                   <FormMessage />
@@ -267,6 +277,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Type here"
                       {...field}
                       className="min-h-[100px]"
+                      maxLength={1000}
                     />
                   </FormControl>
                   <FormMessage />
@@ -288,6 +299,7 @@ export default function AddCompanyForm({ onClose }: { onClose: () => void }) {
                       placeholder="Type here"
                       {...field}
                       className="min-h-[100px]"
+                      maxLength={1000}
                     />
                   </FormControl>
                   <FormMessage />
