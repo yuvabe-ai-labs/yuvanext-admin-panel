@@ -1,70 +1,64 @@
-import { supabase } from "@/integrations/supabase/client";
+import axiosInstance from "@/config/platform-api";
+import { handleApiError, handleApiResponse } from "@/lib/api-handler";
 
-export const suspendUnit = async (unitId: string) => {
-  if (!confirm("Are you sure you want to suspend this unit?")) return;
+export interface Account {
+  userId: string;
+  accountDisabled: boolean;
+  message: string;
+}
 
-  // 1️⃣ Mark unit as suspended
-  const { error: updateError } = await supabase
-    .from("units")
-    .update({ is_suspended: true })
-    .eq("id", unitId);
+export const deactivateUnitAccount = async (
+  Id: string,
+): Promise<Account> => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/units/${Id}/deactivate`,
+    );
 
-  if (updateError) {
-    console.error(updateError);
-    alert("Failed to update unit.");
-    return;
+    return handleApiResponse<Account>(response, {} as Account);
+  } catch (error) {
+    return handleApiError(error, "Failed to deactivate account");
   }
+};
 
-  // 2️⃣ Fetch the unit row (get profile_id)
-  const { data: unit, error: unitError } = await supabase
-    .from("units")
-    .select("id, profile_id")
-    .eq("id", unitId)
-    .single();
+export const activateUnitAccount = async (
+  Id: string,
+): Promise<Account> => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/units/${Id}/activate`,
+    );
 
-  if (unitError || !unit) {
-    console.error(unitError);
-    alert("Unit not found.");
-    return;
+    return handleApiResponse<Account>(response, {} as Account);
+  } catch (error) {
+    return handleApiError(error, "Failed to activate account");
   }
+};
 
-  // 3️⃣ Fetch the profile (get auth user_id)
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("user_id")
-    .eq("id", unit.profile_id)
-    .single();
+export const activateInternship = async (
+  Id: string,
+): Promise<Account> => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/internships/${Id}/enable`,
+    );
 
-  if (profileError || !profile) {
-    console.error(profileError);
-    alert("Profile not found.");
-    return;
+    return handleApiResponse<Account>(response, {} as Account);
+  } catch (error) {
+    return handleApiError(error, "Failed to activate internship");
   }
+};
 
-  // // 1️⃣ Mark unit profiles as suspended
-  // const { error: profileUpdateError } = await supabase
-  //   .from("profiles")
-  //   .update({ is_suspended: true })
-  //   .eq("id", unit.profile_id);
+export const deactivateInternship = async (
+  Id: string,
+): Promise<Account> => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/internships/${Id}/disable`,
+    );
 
-  // if (profileUpdateError) {
-  //   console.error(profileUpdateError);
-  //   alert("Failed to update profile.");
-  //   return;
-  // }
-
-  const authUserId = profile.user_id; // this is the real Auth UUID
-
-  // 4️⃣ Call the Edge Function to ban the user
-  const { error: fnError } = await supabase.functions.invoke("suspend-unit", {
-    body: { auth_id: authUserId },
-  });
-
-  if (fnError) {
-    console.error(fnError);
-    alert("Failed to suspend auth user.");
-    return;
+    return handleApiResponse<Account>(response, {} as Account);
+  } catch (error) {
+    return handleApiError(error, "Failed to deactivate internship");
   }
-
-  alert("Unit suspended successfully!");
 };

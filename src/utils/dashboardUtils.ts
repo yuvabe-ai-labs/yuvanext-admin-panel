@@ -1,46 +1,38 @@
-interface Profile {
-  profile: {
-    created_at: string;
-  };
-}
+import { type SignupPerformanceData } from "@/types/stats.types";
+import { format, parseISO, startOfMonth, subMonths } from "date-fns";
 
-export function getNewProfilesThisMonth(profiles: Profile[]): number {
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  return profiles.filter(
-    (item) => new Date(item.profile.created_at) >= startOfMonth
-  ).length;
+export interface PerformanceData {
+  month: string;
+  value: number;
+  candidates: number;
+  units: number;
 }
 
 export function calculateMonthlySignups(
-  students: Profile[],
-  units: Profile[]
-): Array<{ month: string; value: number }> {
-  const allProfiles = [
-    ...students.map((s) => s.profile),
-    ...units.map((u) => u.profile),
-  ];
-
-  const monthsData = [];
+  signupData: SignupPerformanceData[],
+): PerformanceData[] {
   const now = new Date();
 
-  for (let i = 5; i >= 0; i--) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthName = monthDate.toLocaleDateString("en-US", { month: "short" });
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+  const lastSixMonths = Array.from({ length: 6 }, (_, i) => {
+    const monthDate = startOfMonth(subMonths(now, 5 - i));
+    return format(monthDate, "MMM yyyy");
+  });
 
-    const signupsInMonth = allProfiles.filter((profile) => {
-      const createdAt = new Date(profile.created_at);
-      return createdAt >= monthDate && createdAt < nextMonth;
-    }).length;
-
-    monthsData.push({
-      month: monthName,
-      value: signupsInMonth,
+  return lastSixMonths.map((monthKey) => {
+    const monthlyItems = signupData.filter((item) => {
+      const itemDate = parseISO(item.createdAt);
+      return format(startOfMonth(itemDate), "MMM yyyy") === monthKey;
     });
-  }
+    const candidates = monthlyItems.filter((i) =>
+      i.type === "candidate"
+    ).length;
+    const units = monthlyItems.filter((i) => i.type === "unit").length;
 
-  return monthsData;
+    return {
+      month: monthKey,
+      value: monthlyItems.length,
+      candidates,
+      units,
+    };
+  });
 }

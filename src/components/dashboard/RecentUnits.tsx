@@ -1,14 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
-import type { Unit } from "@/types/profile.types";
+import { useRecentUnits } from "@/hooks/useRecentUsers";
 
-interface RecentUnitsProps {
-  units: Unit[];
-  isLoading: boolean;
-}
+export default function RecentUnits() {
+  const { data: units, isLoading } = useRecentUnits(1, 10);
 
-export default function RecentUnits({ units, isLoading }: RecentUnitsProps) {
   return (
     <Card className="border border-border rounded-2xl shadow-sm bg-white">
       <div className="p-6">
@@ -19,22 +16,18 @@ export default function RecentUnits({ units, isLoading }: RecentUnitsProps) {
             <p className="text-center text-sm text-muted-foreground">
               Loading...
             </p>
-          ) : units.length === 0 ? (
+          ) : !units || units.length === 0 ? (
             <p className="text-center text-sm text-muted-foreground">
               No recent units
             </p>
           ) : (
             units.map((unit) => {
-              const { profile, unit_profile } = unit;
-
-              const unitName = unit_profile?.unit_name || profile?.full_name;
-
-              const avatarUrl = unit_profile?.avatar_url ?? undefined;
-              // const unitType = unit_profile?.unit_type ?? null;
-              const address = unit_profile?.address ?? null;
+              const unitName = unit.name || "Unknown Unit";
+              const avatarUrl = unit.avatarUrl ?? undefined;
+              const address = unit.address ?? null;
 
               return (
-                <div key={profile.id} className="flex items-start gap-3 px-1">
+                <div key={unit.userId} className="flex items-start gap-3 px-1">
                   <Avatar className="h-14 w-14">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback>
@@ -44,12 +37,6 @@ export default function RecentUnits({ units, isLoading }: RecentUnitsProps) {
 
                   <div className="flex flex-col gap-0.5">
                     <p className="font-medium text-sm">{unitName}</p>
-
-                    {/* {unitType && (
-                      <p className="text-[12px] text-muted-foreground">
-                        {unitType}
-                      </p>
-                    )} */}
 
                     {address && (
                       <p className="text-[11px] text-muted-foreground flex items-center gap-1">

@@ -10,10 +10,24 @@ import {
   endOfWeek,
   startOfDay,
 } from "date-fns";
-import type { StudentTask } from "@/types/studentTasks.types";
+
+// Local interface for transformed task data used by calendar
+interface CalendarTask {
+  id: string;
+  title: string;
+  description: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  color: string;
+  status: string;
+  submission_link: string | null;
+  review_remarks: string | null;
+}
 
 interface TaskCalendarProps {
-  tasks: StudentTask[];
+  tasks: CalendarTask[];
   currentDate: Date;
   onDateChange: (date: Date) => void;
   viewMode: "month" | "week";
@@ -57,6 +71,9 @@ export default function TaskCalendar({
   };
 
   const getTasksForDay = (day: Date) => {
+    if (day.getDay() === 0) {
+      return [];
+    }
     return tasks.filter((task) => {
       if (!task.start_date || !task.end_date) return false;
 
@@ -77,16 +94,55 @@ export default function TaskCalendar({
     try {
       const [hours, minutes] = time.split(":").map(Number);
       const totalMinutes = hours * 60 + minutes;
-      return (totalMinutes / 1440) * 100; // 1440 minutes in a day
+      return (totalMinutes / 1440) * 100;
     } catch {
       return 0;
     }
   };
 
+  const MIN_TITLE_WIDTH = 40;
+
+  const getTitleDay = (task: CalendarTask): Date | null => {
+    if (!task.start_date || !task.end_date) return null;
+
+    const taskStart = startOfDay(new Date(task.start_date));
+    const taskEnd = startOfDay(new Date(task.end_date));
+    const candidate = new Date(taskStart);
+
+    while (candidate.getTime() <= taskEnd.getTime()) {
+      // Always skip Sundays
+      if (candidate.getDay() === 0) {
+        candidate.setDate(candidate.getDate() + 1);
+        continue;
+      }
+
+      const isStartDay = candidate.getTime() === taskStart.getTime();
+      const isEndDay = candidate.getTime() === taskEnd.getTime();
+
+      let visibleWidth = 100; // middle days use the full cell width
+
+      if (isStartDay && isEndDay) {
+        visibleWidth =
+          timeToPercentage(task.end_time) - timeToPercentage(task.start_time);
+      } else if (isStartDay) {
+        visibleWidth = 100 - timeToPercentage(task.start_time);
+      } else if (isEndDay) {
+        visibleWidth = timeToPercentage(task.end_time);
+      }
+
+      if (visibleWidth >= MIN_TITLE_WIDTH) {
+        return new Date(candidate);
+      }
+
+      candidate.setDate(candidate.getDate() + 1);
+    }
+    return taskStart;
+  };
+
   const renderTaskBar = (
-    task: StudentTask,
+    task: CalendarTask,
     day: Date,
-    dayTasks: StudentTask[]
+    dayTasks: CalendarTask[],
   ) => {
     if (!task.start_date || !task.end_date) return null;
 
@@ -94,29 +150,44 @@ export default function TaskCalendar({
     const taskEnd = startOfDay(new Date(task.end_date));
     const currentDay = startOfDay(day);
 
-    const isStartDay = currentDay.getTime() === taskStart.getTime();
+    const isRealStartDay = currentDay.getTime() === taskStart.getTime();
     const isEndDay = currentDay.getTime() === taskEnd.getTime();
     const isMiddleDay =
       currentDay.getTime() > taskStart.getTime() &&
       currentDay.getTime() < taskEnd.getTime();
 
-    if (!isStartDay && !isMiddleDay && !isEndDay) return null;
+    if (!isRealStartDay && !isMiddleDay && !isEndDay) return null;
+
+    const taskStartsOnSunday = new Date(task.start_date).getDay() === 0;
+    const isMonday = day.getDay() === 1;
+    const isSundayCarryOver = taskStartsOnSunday && isMonday && isMiddleDay;
+
+    const titleDay = getTitleDay(task);
+    const shouldShowTitle =
+      titleDay && startOfDay(titleDay).getTime() === currentDay.getTime();
 
     const taskIndex = dayTasks.findIndex((t) => t.id === task.id);
 
-    // Calculate positioning based on time (kept for layout)
     let leftOffset = 0;
     let rightOffset = 0;
     let borderRadius = "";
 
-    if (isStartDay && isEndDay) {
+    if (isRealStartDay && isEndDay) {
       leftOffset = timeToPercentage(task.start_time);
       rightOffset = 100 - timeToPercentage(task.end_time);
       borderRadius = "rounded-full";
-    } else if (isStartDay) {
+    } else if (isRealStartDay) {
       leftOffset = timeToPercentage(task.start_time);
       rightOffset = 0;
       borderRadius = "rounded-l-full";
+    } else if (isSundayCarryOver && isEndDay) {
+      leftOffset = 0;
+      rightOffset = 100 - timeToPercentage(task.end_time);
+      borderRadius = "rounded-r-full";
+    } else if (isSundayCarryOver) {
+      leftOffset = 0;
+      rightOffset = 0;
+      borderRadius = "";
     } else if (isEndDay) {
       leftOffset = 0;
       rightOffset = 100 - timeToPercentage(task.end_time);
@@ -124,9 +195,9 @@ export default function TaskCalendar({
     } else {
       leftOffset = 0;
       rightOffset = 0;
+      borderRadius = "";
     }
 
-    // Tooltip only shows task title now
     return (
       <div
         key={task.id}
@@ -141,12 +212,17 @@ export default function TaskCalendar({
             backgroundColor: task.color || "#3B82F6",
             left: `${leftOffset}%`,
             right: `${rightOffset}%`,
-            paddingLeft: isStartDay ? "12px" : "4px",
+            paddingLeft:
+              isRealStartDay || isSundayCarryOver
+                ? "12px"
+                : shouldShowTitle
+                  ? "8px"
+                  : "4px",
             paddingRight: isEndDay ? "12px" : "4px",
           }}
           title={task.title}
         >
-          {isStartDay ? (
+          {shouldShowTitle ? (
             <span className="truncate font-medium">{task.title}</span>
           ) : (
             <span>&nbsp;</span>

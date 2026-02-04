@@ -2,11 +2,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Mail, Phone, MapPin, Clock, Ban } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Ban, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { useUnitView } from "@/hooks/useUnitView";
-// import ProfileSummaryDialog from "@/components/ProfileSummaryDialog";
-// import ApplicationSuccessDialog from "@/components/ApplicationSuccessDialog";
+import { useUnitDetail } from "@/hooks/useViewProfile";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -14,23 +12,50 @@ import {
   ThreadIcon,
   TwitterIcon,
 } from "@/components/ui/custom-icons";
-import { suspendUnit } from "@/services/suspend.service";
-
-const safeParse = (data: any, fallback: any) => {
-  if (!data) return fallback;
-  try {
-    return typeof data === "string" ? JSON.parse(data) : data;
-  } catch {
-    return fallback;
-  }
-};
+import { useDeactivateAccount, useActivateAccount } from "@/hooks/useSuspend";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const UnitView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { unit, internships, loading, error } = useUnitView(id || "");
+  const { data: unit, isLoading, error } = useUnitDetail(id);
+  const deactivateMutation = useDeactivateAccount();
+  const activateMutation = useActivateAccount();
 
-  if (loading) {
+  const handleSuspendAccount = async () => {
+    if (!id) return;
+    try {
+      await deactivateMutation.mutateAsync(id);
+      toast.success(`${unit?.name}'s account has been suspended`);
+    } catch (error) {
+      console.error("Error suspending account:", error);
+      toast.error("Failed to suspend account. Please try again.");
+    }
+  };
+
+  const handleActivateAccount = async () => {
+    if (!id) return;
+    try {
+      await activateMutation.mutateAsync(id);
+      toast.success(`${unit?.name}'s account has been reactivated`);
+    } catch (error) {
+      console.error("Error activating account:", error);
+      toast.error("Failed to reactivate account. Please try again.");
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -59,7 +84,7 @@ const UnitView = () => {
             Unit Not Found
           </h1>
           <p className="text-muted-foreground mb-6">
-            {error || "The unit you are looking for does not exist."}
+            The unit you are looking for does not exist.
           </p>
           <Button onClick={() => navigate("/units")}>Back to Units</Button>
         </div>
@@ -67,35 +92,39 @@ const UnitView = () => {
     );
   }
 
+  const internships = unit.internships || [];
+
+  const isInactive = unit.userAccountStatus;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       <div className="relative h-70.5 bg-linear-to-r from-primary/10 via-secondary/10 to-accent/10">
-        {unit.banner_url && (
+        {unit.bannerUrl && (
           <img
-            src={unit.banner_url}
-            // alt={unit.unit_name}
+            src={unit.bannerUrl}
+            alt={unit.name || "Unit banner"}
             className="w-full h-full object-cover"
           />
         )}
       </div>
 
-      <div className="md:-mt-33 pt-0 container p-0 md:px-30  md:py-10">
+      <div className="md:-mt-33 pt-0 container p-0 md:px-30 md:py-10 mx-auto">
         {/* Hero Section with Unit Info */}
-        <Card className="relative border border-gray-200 md:mb-2.5 overflow-hidden  bg-white rounded-none md:rounded-3xl">
+        <Card className="relative border border-gray-200 md:mb-2.5 overflow-hidden bg-white rounded-none md:rounded-3xl">
           <CardContent className="p-7.5">
             <div className="flex flex-col md:flex-row items-start gap-7">
               {/* Unit Logo */}
               <div className="hidden md:flex justify-center items-center w-32 h-32 rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
-                {(unit as any).avatar_url ? (
+                {unit.avatarUrl ? (
                   <img
-                    src={(unit as any).avatar_url}
-                    alt={unit.unit_name || ""}
+                    src={unit.avatarUrl}
+                    alt={unit.name || "Unit logo"}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  unit.unit_name?.charAt(0) || "U"
+                  unit.name?.charAt(0) || "U"
                 )}
               </div>
 
@@ -104,17 +133,17 @@ const UnitView = () => {
                 <h1 className="text-3xl font-bold text-foreground mb-2 flex gap-2.5">
                   {/* Unit Logo For Mobile*/}
                   <div className="w-10 h-10 flex justify-center items-center md:hidden rounded-full bg-background border-4 border-background shadow-md text-4xl font-bold text-foreground overflow-hidden">
-                    {(unit as any).avatar_url ? (
+                    {unit.avatarUrl ? (
                       <img
-                        src={(unit as any).avatar_url}
-                        // alt={unit.unit_name}
+                        src={unit.avatarUrl}
+                        alt={unit.name || "Unit logo"}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      unit.unit_name?.charAt(0) || "U"
+                      unit.name?.charAt(0) || "U"
                     )}
                   </div>
-                  {unit.unit_name}
+                  {unit.name}
                 </h1>
                 <p className="text-muted-foreground mb-3 pr-4">
                   {unit.description ||
@@ -123,16 +152,16 @@ const UnitView = () => {
 
                 {/* Contact Info Row */}
                 <div className="flex flex-wrap gap-6 text-sm text-muted-foreground mb-4">
-                  {unit.contact_email && (
+                  {unit.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
-                      <span>{unit.contact_email}</span>
+                      <span>{unit.email}</span>
                     </div>
                   )}
-                  {unit.contact_phone && (
+                  {unit.phone && (
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      <span>{unit.contact_phone}</span>
+                      <span>{unit.phone}</span>
                     </div>
                   )}
                   {unit.address && (
@@ -146,91 +175,129 @@ const UnitView = () => {
                 {/* Visit Website and Social Links */}
                 <div className="flex gap-4 items-center">
                   {/* Social Links */}
-                  {(() => {
-                    const socialLinks = safeParse(unit.social_links, []);
-                    if (socialLinks.length === 0) return null;
-
-                    const getSocialIcon = (link: any) => {
-                      // Detect platform from URL or platform field
-                      const url = (link.url || link).toLowerCase();
-                      const platform = (link.platform || "").toLowerCase();
-
-                      if (
-                        platform.includes("linkedin") ||
-                        url.includes("linkedin.com")
-                      )
-                        return LinkedinIcon;
-                      if (
-                        platform.includes("instagram") ||
-                        url.includes("instagram.com")
-                      )
-                        return InstagramIcon;
-                      if (
-                        platform.includes("facebook") ||
-                        url.includes("facebook.com")
-                      )
-                        return FacebookIcon;
-                      if (
-                        platform.includes("twitter") ||
-                        platform.includes("x") ||
-                        url.includes("twitter.com") ||
-                        url.includes("x.com")
-                      )
-                        return TwitterIcon;
-                      if (
-                        platform.includes("thread") ||
-                        url.includes("thread.com")
-                      )
-                        return ThreadIcon;
-                    };
-
-                    return (
+                  {unit.socialLinks &&
+                    Object.keys(unit.socialLinks).length > 0 && (
                       <div className="flex gap-4 font-bold">
-                        {socialLinks.map((link: any, idx: number) => {
-                          const Icon = getSocialIcon(link);
-                          const url = link.url || link;
-                          if (!Icon) return null;
-                          return (
-                            <button
-                              key={idx}
-                              className="bg-transparent text-[#020817] p-0"
-                              // asChild
-                            >
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                        {Object.entries(unit.socialLinks).map(
+                          ([platform, url], idx) => {
+                            const getSocialIcon = (platform: string) => {
+                              const p = platform.toLowerCase();
+                              if (p.includes("linkedin")) return LinkedinIcon;
+                              if (p.includes("instagram")) return InstagramIcon;
+                              if (p.includes("facebook")) return FacebookIcon;
+                              if (p.includes("twitter") || p.includes("x"))
+                                return TwitterIcon;
+                              if (p.includes("thread")) return ThreadIcon;
+                              return null;
+                            };
+
+                            const Icon = getSocialIcon(platform);
+                            if (!Icon) return null;
+
+                            return (
+                              <button
+                                key={idx}
+                                className="bg-transparent text-[#020817] p-0"
                               >
-                                <Icon className="w-5 h-5" />
-                              </a>
-                            </button>
-                          );
-                        })}
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Icon className="w-5 h-5" />
+                                </a>
+                              </button>
+                            );
+                          },
+                        )}
                       </div>
-                    );
-                  })()}
-                  {unit.website_url && (
+                    )}
+
+                  {unit.websiteUrl && (
                     <button className="text-[#020817] font-medium border-gray-600 border bg-transparent px-3 py-1 rounded-full">
                       <a
-                        href={unit.website_url}
+                        href={unit.websiteUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {/* <Globe className="w-4 h-4" /> */}
                         Visit Website
                       </a>
                     </button>
                   )}
 
-                  <button
-                    onClick={() => suspendUnit(id || "")}
-                    className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-red-500  cursor-pointer border-variable-collection-red-500 hover:bg-transparent"
-                  >
-                    <Ban className="w-5 h-5 text-red-500" />
-                    <span className=" font-medium text-red-500 text-2.5 text-center">
-                      Suspend Account
-                    </span>
-                  </button>
+                  {!isInactive ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-red-500 cursor-pointer hover:bg-red-50 transition-colors">
+                          <Ban className="w-5 h-5 text-red-500" />
+                          <span className="font-medium text-red-500 text-sm text-center">
+                            Suspend Account
+                          </span>
+                        </button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Suspend this account?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will suspend {unit.name}'s account immediately.
+                            They will lose access to the platform.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleSuspendAccount}
+                            disabled={deactivateMutation.isPending}
+                            className="bg-red-600 text-white hover:bg-red-700"
+                          >
+                            {deactivateMutation.isPending
+                              ? "Suspending..."
+                              : "Suspend Account"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button className="inline-flex items-center gap-2.5 bg-transparent rounded-full py-1 px-3 border border-green-500 cursor-pointer hover:bg-green-50 transition-colors">
+                          <Check className="w-5 h-5 text-green-500" />
+                          <span className="font-medium text-green-500 text-sm text-center">
+                            Reactivate Account
+                          </span>
+                        </button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Reactivate this account?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will restore {unit.name}'s access to the
+                            platform.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleActivateAccount}
+                            disabled={activateMutation.isPending}
+                            className="bg-green-600 text-white hover:bg-green-700"
+                          >
+                            {activateMutation.isPending
+                              ? "Reactivating..."
+                              : "Reactivate Account"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               </div>
             </div>
@@ -255,10 +322,7 @@ const UnitView = () => {
               ) : (
                 <div className="space-y-2.5">
                   {internships.map((internship) => {
-                    const skillsRequired = safeParse(
-                      internship.skills_required,
-                      []
-                    );
+                    const skillsRequired = internship.skillsRequired || [];
 
                     return (
                       <Card
@@ -274,11 +338,11 @@ const UnitView = () => {
                                   {/* Internship Icon */}
                                   <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center shrink-0">
                                     <span className="text-lg font-bold">
-                                      {unit.avatar_url ? (
+                                      {unit.avatarUrl ? (
                                         <img
                                           className="w-12 h-12 rounded-full"
-                                          src={unit.avatar_url}
-                                          alt={`${unit.unit_name} logo`}
+                                          src={unit.avatarUrl}
+                                          alt={`${unit.name} logo`}
                                         />
                                       ) : (
                                         internship.title.charAt(0)
@@ -337,7 +401,7 @@ const UnitView = () => {
                                 </div>
                               )}
 
-                              {/* View Button */}
+                              {/* View Button Mobile */}
                               <Button
                                 variant="gradient"
                                 className="rounded-full bg-clip-text text-transparent border border-orange-600 visible w-full bg-transparent md:hidden mt-4"
@@ -378,7 +442,7 @@ const UnitView = () => {
                 </p>
               </div>
               {/* Our Values */}
-              <div className="border  border-gray-300 p-5 rounded-xl">
+              <div className="border border-gray-300 p-5 rounded-xl">
                 <h3 className="text-lg font-semibold text-foreground">
                   Our Values
                 </h3>
@@ -393,23 +457,11 @@ const UnitView = () => {
 
         {/* Glimpse of the Unit & Gallery */}
         {(() => {
-          const glimpseUrl = (unit as any).glimpse;
-          const galleryImagesRaw = (unit as any).gallery_images;
-          let galleryImages: string[] = [];
+          const galleryVideos = unit.galleryVideos || [];
+          const galleryImages = unit.galleryImages || [];
 
-          try {
-            if (typeof galleryImagesRaw === "string") {
-              galleryImages = JSON.parse(galleryImagesRaw);
-            } else if (Array.isArray(galleryImagesRaw)) {
-              galleryImages = galleryImagesRaw;
-            }
-          } catch {
-            galleryImages = [];
-          }
-
-          const hasVideo = glimpseUrl && typeof glimpseUrl === "string";
-          const hasImages =
-            Array.isArray(galleryImages) && galleryImages.length > 0;
+          const hasVideo = galleryVideos.length > 0;
+          const hasImages = galleryImages.length > 0;
 
           // If neither video nor images exist, return null
           if (!hasVideo && !hasImages) return null;
@@ -434,7 +486,7 @@ const UnitView = () => {
                       className="w-full h-full object-cover"
                       preload="metadata"
                     >
-                      <source src={glimpseUrl} type="video/mp4" />
+                      <source src={galleryVideos[0]} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -462,28 +514,6 @@ const UnitView = () => {
           );
         })()}
       </div>
-
-      {/* Application Dialog */}
-      {/* {selectedInternship && (
-        <ProfileSummaryDialog
-          isOpen={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
-          internship={selectedInternship}
-          onSuccess={() => {
-            setIsDialogOpen(false);
-            setShowSuccessDialog(true);
-          }}
-        />
-      )} */}
-
-      {/* Success Dialog */}
-      {/* <ApplicationSuccessDialog
-        isOpen={showSuccessDialog}
-        onClose={() => {
-          setShowSuccessDialog(false);
-          setSelectedInternship(null);
-        }}
-      /> */}
     </div>
   );
 };

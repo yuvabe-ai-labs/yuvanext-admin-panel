@@ -3,6 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { MoveUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTasksByApplicationId } from "@/hooks/useCandidateTask";
+import { calculateOverallTaskProgress } from "@/utils/taskProgress";
+import { useMemo } from "react";
 
 interface HiredCandidateCardProps {
   id: string;
@@ -25,101 +28,107 @@ export default function HiredCandidateCard({
   unit_name,
   unit_avatar_url,
 }: HiredCandidateCardProps) {
+  const navigate = useNavigate();
+
+  // Fetch task data to calculate progress
+  const { data } = useTasksByApplicationId(id);
+
+  const taskProgress = useMemo(() => {
+    if (!data?.tasks || data.tasks.length === 0) return 0;
+    return calculateOverallTaskProgress(data.tasks);
+  }, [data?.tasks]);
+
   const formatJobType = (type: string | null | undefined) => {
     if (!type) return "Not specified";
-
-    // Convert job_type enum to readable format
     const jobTypeMap: { [key: string]: string } = {
       full_time: "Full time",
       part_time: "Part time",
       contract: "Contract",
       internship: "Internship",
     };
-
     return jobTypeMap[type] || type;
-  };
-  const navigate = useNavigate();
-  const handleViewCandidate = (applicationId: string) => {
-    navigate(`/candidate-tasks/${applicationId}`);
   };
 
   return (
-    <Card className="border border-gray-200 rounded-3xl hover:shadow-lg transition-shadow">
-      <CardContent className="p-6 space-y-4">
+    <Card className="border border-gray-200 rounded-3xl hover:shadow-lg transition-shadow bg-white">
+      <CardContent className="p-6 space-y-6">
         {/* Header Section */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <p className="text-sm text-gray-600 mb-3">{internship_title}</p>
-
+            <p className="text-sm text-gray-500 mb-3">{internship_title}</p>
             <div className="flex items-center gap-4">
-              {/* Avatar with Unit Logo Overlay */}
-              <div className="relative">
-                <Avatar className="w-20 h-20">
+              <div className="flex -space-x-4">
+                {/* Candidate Avatar */}
+                <Avatar className="w-16 h-16 border-2 border-white relative z-10">
                   <AvatarImage
                     src={avatar_url || undefined}
-                    alt={name}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-lg font-semibold bg-gray-200">
-                    {name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                  <AvatarFallback className="bg-gray-200">
+                    {name[0]}
                   </AvatarFallback>
                 </Avatar>
 
-                {/* Unit Logo Badge - positioned bottom-right */}
-                <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-white shadow-md overflow-hidden">
+                {/* Unit Avatar - Same size as candidate */}
+                <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center border-2 border-white overflow-hidden relative z-20">
                   {unit_avatar_url ? (
                     <img
                       src={unit_avatar_url}
-                      alt={unit_name || "Unit"}
+                      alt="unit"
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {unit_name
-                          ?.split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2) || "UN"}
-                      </span>
-                    </div>
+                    <span className="text-white text-xl font-bold">X</span>
                   )}
                 </div>
               </div>
-
-              {/* Name and Hired Status */}
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">{name}</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span className="text-sm text-gray-600">
-                    Hired by {unit_name || "Unknown Unit"}
+                <h3 className="text-xl font-bold text-gray-900">{name}</h3>
+                <div className="flex items-center gap-1.5">
+                  {/* Status with Green Ring */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-emerald-500">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    Hired by {unit_name}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Duration Info */}
-          <div className="text-right text-sm text-gray-600">
-            <span>
-              {duration || "Duration not specified"} | {formatJobType(job_type)}
-            </span>
+          <div className="text-right text-xs text-gray-400 font-medium">
+            {duration} | {formatJobType(job_type)}
           </div>
         </div>
-        <div className="flex justify-end pt-2">
+
+        {/* Progress Bar Section */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-end">
+            <span className="text-sm font-bold text-slate-700">
+              Projects Progress
+            </span>
+            <span className="text-sm font-bold text-slate-700">
+              {taskProgress}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2.5">
+            <div
+              className="bg-emerald-400 h-2.5 rounded-full transition-all duration-500"
+              style={{ width: `${taskProgress}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="flex items-center justify-end pt-2">
           <Button
             variant="outline"
-            className="rounded-full text-gray-600 cursor-pointer"
-            onClick={() => handleViewCandidate(id)}
+            size="sm"
+            className="rounded-full border-teal-600 text-teal-600 hover:bg-teal-50 px-4 h-9 text-xs"
+            onClick={() => navigate(`/candidate-tasks/${id}`)}
           >
             View Tasks
-            <MoveUpRight className="w-4 h-4 ml-2" />
+            <MoveUpRight className="w-3.5 h-3.5 ml-2" />
           </Button>
         </div>
       </CardContent>
