@@ -5,6 +5,11 @@ const envSchema = z.object({
   VITE_STAGE_TYPE: z.enum(["development", "staging", "production"]).default(
     "development",
   ),
+  // Hides the environment ribbon — only enabled for the ATR deployment
+  VITE_HIDE_ENV_RIBBON: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
 });
 
 const _env = envSchema.safeParse(import.meta.env);
