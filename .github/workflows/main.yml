@@ -52,6 +52,7 @@ jobs:
             echo "VITE_API_URL=${{ secrets.BACKEND_URL_ATR }}" >> $GITHUB_ENV
             echo "S3_BUCKET_NAME=${{ secrets.BUCKET_NAME_ATR }}" >> $GITHUB_ENV
             echo "CLOUDFRONT_DISTRIBUTION_ID=${{ secrets.CF_DISTRIBUTION_ATR }}" >> $GITHUB_ENV
+            echo "VITE_HIDE_ENV_RIBBON=true" >> $GITHUB_ENV
 
           else
             echo "VITE_STAGE_TYPE=development" >> $GITHUB_ENV
